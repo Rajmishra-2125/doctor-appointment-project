@@ -251,7 +251,7 @@ Auth
 
 You are currently at:
 
-> **PHASE 7 →Doctor Availability**
+> **PHASE 5 → COMMUNICATION & UX**
 
 This is the **correct and industry-standard path**.
 
