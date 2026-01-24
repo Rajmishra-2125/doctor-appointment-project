@@ -253,16 +253,16 @@ You are currently at:
 
 > **PHASE 5 → COMMUNICATION & UX**
 
-This is the **correct and industry-standard path**.
+This is the **communication and UX-standard path**.
 
 ---
 
 ## 🚀 Next Step
 
-After completing follow/unfollow:
+After COMMUNICATION & UX:
 
-* Implement doctor listing & search
-* Then move to availability & appointment booking
+* Implement patient can give review to the doctor
+* Then move to security & polish part
 
 ---
 
