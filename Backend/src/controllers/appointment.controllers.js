@@ -19,7 +19,7 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
   const selectedDate = new Date(date)
 
   if (isNaN(selectedDate.getTime())) {
-    throw new ApiError(401, "Invalid date format");
+    throw new ApiError(401, "Invalid date format. Enter: YYYY-MM-DD");
   }
 
   const doctor = await Doctor.findOne({ username: username.toLowerCase() });
@@ -27,7 +27,10 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Doctor doesn't exists");
   }
 
-  const doctorId = doctor._id;
+  const doctorId = doctor.doctor._id;
+
+  console.log("DoctorId is:", doctorId);
+  
 
   const slots = await Slot.aggregate([{
     $match: {
@@ -62,7 +65,7 @@ const applyForBooking = asyncHandler(async (req, res) => {
   const selectTime = new Date(date);
 
   if (isNaN(selectTime.getTime())) {
-    throw new ApiError(401, "Invalid date format")
+    throw new ApiError(401, "Invalid date format. Enter: YYYY-MM-DD");
   }
 
   const doctor = await Doctor.findOne({username: username})
@@ -71,7 +74,7 @@ const applyForBooking = asyncHandler(async (req, res) => {
   if (!doctor) {
     throw new ApiError(404, "Doctor doesn't exists")
   }
-  const doctorId = doctor._id;
+  const doctorId = doctor.doctor._id;
   console.log("doctorId = ", doctorId);
   console.log("patientId = ", patientId);
 
@@ -124,7 +127,7 @@ const cancelBooking = asyncHandler(async(req, res) => {
   const selectedDate = new Date(date)
 
   if (isNaN(selectedDate.getTime())) {
-    throw new ApiError(400, "Invalid date format");
+    throw new ApiError(400, "Invalid date format. Enter: YYYY-MM-DD");
   }
 
   const doctor = await Doctor.findOne({username: username.toLowerCase()})
@@ -133,7 +136,7 @@ const cancelBooking = asyncHandler(async(req, res) => {
     throw new ApiError(404, "Doctor doesn't exists")
   }
 
-  const doctorId = doctor._id;
+  const doctorId = doctor.doctor._id;
   console.log("patientId", patientId);
   console.log("doctorId", doctorId);
   console.log("date", new Date(date).toISOString());
@@ -170,7 +173,7 @@ const cancelBooking = asyncHandler(async(req, res) => {
   )
 
   if (!slot) {
-    throw new ApiError(404, "Slot cancellation failed")
+    throw new ApiError(404, "Slot cancellation failed or no slot available")
   }
   
   appointment.status = "CANCELLED"
@@ -184,6 +187,6 @@ const cancelBooking = asyncHandler(async(req, res) => {
     "Appointment cancelled successfully"
   ))
   
-})
+});
 
 export { getAvailableSlots, applyForBooking, cancelBooking };

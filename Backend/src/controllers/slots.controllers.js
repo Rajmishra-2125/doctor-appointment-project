@@ -26,7 +26,7 @@ const createingNewSlots = asyncHandler(async(req, res) => {
       throw new ApiError(404, "Only doctor can create slots")
     }
 
-  const doctorId = doctor._id;
+  const doctorId = doctor.doctor._id;
 
     const checkSlot = await Slot.findOne(
       {
@@ -57,27 +57,41 @@ const createingNewSlots = asyncHandler(async(req, res) => {
     .status(201)
     .json(new ApiResponse(200, {data: slots}, "Slots created successfully"))
 
-}) 
+}); 
 
 const deleteSlot = asyncHandler(async(req, res) => {
   const doctorId = req.user?._id;
   const { slotNumber, date } = req.body;
 
-  console.log("doctorId", doctorId);
+  if (!slotNumber || !date) {
+    throw new ApiError(400, "All fields are required.");
+  }
+
+  if (isNaN(new Date(date).getTime())) {
+    throw new ApiError(404, "Invalid date format. Enter: YYYY-MM-DD");
+  }
+
+  console.log("doctorId is:", doctorId);
 
    const doctor = await Doctor.findOne({ doctor: doctorId });
 
    if (!doctor) {
      throw new ApiError(404, "Only doctor can delete slots");
    }
+
+   const newDate = new Date(date)
   
   const slot = await Slot.findOneAndDelete(
     {
       slotNumber: slotNumber,
       doctorId: doctorId,
-      date: new Date(date),
+      date: newDate,
       status: "AVAILABLE",
     })
+
+    
+
+    console.log("date", newDate);
 
   console.log("slot", slot);
 
@@ -92,7 +106,7 @@ const deleteSlot = asyncHandler(async(req, res) => {
     "Slot deleted"
   ))
 
-})
+});
 
 
 

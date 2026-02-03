@@ -251,9 +251,9 @@ Auth
 
 You are currently at:
 
-> **PHASE 5 → COMMUNICATION & UX**
+> **PHASE 6 → SECURITY & POLISH**
 
-This is the **communication and UX-standard path**.
+This is the **Final production-level improvements.**.
 
 ---
 

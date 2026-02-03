@@ -135,7 +135,7 @@ const getDoctorProfile = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Username is required");
   }
 
-  const profile = await User.findOne({username}).select("-password")
+  const profile = await User.findOne({username})
   
   if (!profile) {
     throw new ApiError(404, "User is not found");
@@ -224,25 +224,12 @@ const followDoctor = asyncHandler( async(req, res) => {
 
   // 1. Check Doctor/User exists
   const doctor = await Doctor.findOne({ username: username.toLowerCase() })
-  const doctorId = doctor.doctor._id // defines doctor Id
-
-  console.log("doctor = ", doctor);
-
-  console.log("doctorId", doctorId);
-  console.log("patientId", patientId);
-
-  
-
   if (!doctor) {
-    throw new ApiError(400, "Doctor doesn't exists.")
+    throw new ApiError(400, "Doctor doesn't exists.");
   }
-  console.log("Doctor =>", doctor);
+
+  const doctorId = doctor.doctor._id // defines doctor Id
   
-  // 2. Checking User is Doctor
-  const validDoctor = await User.findOne({ username: username });
-  if (validDoctor.role !== "DOCTOR") {
-    throw new ApiError(400, "User is not a doctor");
-  }
 
 
   // 3. Preventing by self-follow
@@ -259,12 +246,10 @@ const followDoctor = asyncHandler( async(req, res) => {
     patient: patientId,
   });
 
-  console.log("Checking following or not", followingOrNot);
-
-
   if (followingOrNot) {
     throw new ApiError(401, "you already follow this doctor");
   }
+
 
   // 4. Following the doctor
   const following = await DoctorFollow.create(
@@ -293,7 +278,7 @@ const followDoctor = asyncHandler( async(req, res) => {
         "Doctor profile fetched successfully"
       )
     );
-})
+});
 
 const unfollowDoctor = asyncHandler(async (req, res) => {
     const {username} = req.params
@@ -304,16 +289,18 @@ const unfollowDoctor = asyncHandler(async (req, res) => {
   if (!doctor) {
     throw new ApiError(404, "doctor doesn't exists.")
   }
-  const doctorId = doctor._id;
+  const doctorId = doctor.doctor._id;
+  console.log("doctorId", doctorId);
+  
 
   const follow = await DoctorFollow.findOne({doctor: doctorId, patient: patientId})
-  console.log("Following or not", follow);
-
+  console.log("Following", follow);
+  
   if (!follow) {
     throw new ApiError(400, "You are not following this doctor")
   }
-
-  const deleteFollowId = await DoctorFollow.deleteOne({ _id: follow._id })
+  
+  const deleteFollowId = await DoctorFollow.findOneAndDelete({ _id: follow._id })
   console.log("deleteFollowId", deleteFollowId);
   
 
@@ -364,7 +351,7 @@ const { specialization } = req.params
     "Success" 
   ))
 
-})
+});
 
 const getDoctorsByMostFollowers = asyncHandler(async(req, res) => {
 const { specialization } = req.params
@@ -405,7 +392,7 @@ return res
     )
   );
 
-})
+});
 
 
 
