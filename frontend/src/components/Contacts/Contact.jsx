@@ -1,293 +1,823 @@
-import React from 'react'
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Clock,
+  Send,
+  CheckCircle,
+  AlertCircle,
+  MessageCircle,
+  Calendar,
+  Ambulance,
+  Headphones,
+  Globe,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube,
+  ChevronDown,
+  ChevronUp,
+  User,
+  Building,
+  FileText,
+  Loader2,
+  Navigation,
+  MapPinned,
+  PhoneCall,
+} from "lucide-react";
 
 function Contact() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    department: "",
+    message: "",
+    preferredContact: "email",
+  });
+
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState(null);
+
+  // Contact information
+  const contactInfo = [
+    {
+      icon: Phone,
+      title: "Phone",
+      details: [
+        { label: "Main Line", value: "+1 (555) 123-4567" },
+        { label: "Appointments", value: "+1 (555) 123-4568" },
+        { label: "Emergency", value: "911" },
+      ],
+      color: "from-blue-500 to-cyan-500",
+      bgColor: "bg-blue-50",
+    },
+    {
+      icon: Mail,
+      title: "Email",
+      details: [
+        { label: "General Inquiries", value: "info@medicare.com" },
+        { label: "Appointments", value: "appointments@medicare.com" },
+        { label: "Billing", value: "billing@medicare.com" },
+      ],
+      color: "from-purple-500 to-pink-500",
+      bgColor: "bg-purple-50",
+    },
+    {
+      icon: MapPin,
+      title: "Location",
+      details: [
+        { label: "Address", value: "123 Healthcare Avenue" },
+        { label: "City", value: "New York, NY 10001" },
+        { label: "Country", value: "United States" },
+      ],
+      color: "from-green-500 to-emerald-500",
+      bgColor: "bg-green-50",
+    },
+    {
+      icon: Clock,
+      title: "Hours",
+      details: [
+        { label: "Monday - Friday", value: "8:00 AM - 8:00 PM" },
+        { label: "Saturday", value: "9:00 AM - 6:00 PM" },
+        { label: "Sunday", value: "10:00 AM - 4:00 PM" },
+      ],
+      color: "from-orange-500 to-amber-500",
+      bgColor: "bg-orange-50",
+    },
+  ];
+
+  // Departments
+  const departments = [
+    "General Inquiry",
+    "Appointment Scheduling",
+    "Billing & Insurance",
+    "Medical Records",
+    "Patient Services",
+    "Technical Support",
+    "Feedback & Complaints",
+    "Other",
+  ];
+
+  // Office locations
+  const locations = [
+    {
+      name: "Main Medical Center",
+      address: "123 Healthcare Avenue, New York, NY 10001",
+      phone: "+1 (555) 123-4567",
+      hours: "Mon-Fri: 8AM-8PM, Sat: 9AM-6PM",
+      services: ["Emergency Care", "Surgery", "Diagnostics", "Outpatient"],
+    },
+    {
+      name: "Downtown Clinic",
+      address: "456 Medical Plaza, New York, NY 10002",
+      phone: "+1 (555) 123-4569",
+      hours: "Mon-Fri: 9AM-6PM",
+      services: ["Primary Care", "Pediatrics", "Lab Services"],
+    },
+    {
+      name: "Uptown Specialty Center",
+      address: "789 Specialist Drive, New York, NY 10003",
+      phone: "+1 (555) 123-4570",
+      hours: "Mon-Sat: 8AM-7PM",
+      services: ["Cardiology", "Neurology", "Orthopedics"],
+    },
+  ];
+
+  // FAQs
+  const faqs = [
+    {
+      question: "How do I schedule an appointment?",
+      answer:
+        "You can schedule an appointment through our online booking system, by calling our appointment line at +1 (555) 123-4568, or by using our AI booking assistant available 24/7 on our website.",
+    },
+    {
+      question: "What insurance plans do you accept?",
+      answer:
+        "We accept most major insurance plans including Blue Cross, Aetna, Cigna, UnitedHealth, Medicare, and Medicaid. Please contact our billing department to verify your specific coverage.",
+    },
+    {
+      question: "Do you offer telemedicine services?",
+      answer:
+        "Yes! We offer virtual consultations for non-emergency medical concerns. You can book a telemedicine appointment through our website or mobile app.",
+    },
+    {
+      question: "What should I bring to my first appointment?",
+      answer:
+        "Please bring a valid ID, your insurance card, a list of current medications, any relevant medical records, and arrive 15 minutes early to complete necessary paperwork.",
+    },
+    {
+      question: "How can I access my medical records?",
+      answer:
+        "You can access your medical records through our patient portal on our website or mobile app. If you need assistance, contact our medical records department at records@medicare.com.",
+    },
+    {
+      question: "Do you have emergency services?",
+      answer:
+        "Yes, our Main Medical Center has a 24/7 emergency department staffed by board-certified emergency physicians. For life-threatening emergencies, always call 911.",
+    },
+    {
+      question: "What are your payment options?",
+      answer:
+        "We accept cash, credit/debit cards, and most insurance plans. We also offer flexible payment plans for qualifying patients. Contact our billing department for more information.",
+    },
+    {
+      question: "Can I request a specific doctor?",
+      answer:
+        "Yes, you can request a specific doctor when booking your appointment. We'll do our best to accommodate your preference based on availability.",
+    },
+  ];
+
+  // Social media links
+  const socialLinks = [
+    {
+      icon: Facebook,
+      name: "Facebook",
+      url: "#",
+      color: "hover:text-blue-600",
+    },
+    { icon: Twitter, name: "Twitter", url: "#", color: "hover:text-sky-500" },
+    {
+      icon: Instagram,
+      name: "Instagram",
+      url: "#",
+      color: "hover:text-pink-600",
+    },
+    {
+      icon: Linkedin,
+      name: "LinkedIn",
+      url: "#",
+      color: "hover:text-blue-700",
+    },
+    { icon: Youtube, name: "YouTube", url: "#", color: "hover:text-red-600" },
+  ];
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear error for this field
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
+  // Validate form
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formData.name.trim()) errors.name = "Name is required";
+    if (!formData.email.trim()) errors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      errors.email = "Email is invalid";
+    if (!formData.phone.trim()) errors.phone = "Phone is required";
+    if (!formData.subject.trim()) errors.subject = "Subject is required";
+    if (!formData.department) errors.department = "Please select a department";
+    if (!formData.message.trim()) errors.message = "Message is required";
+    else if (formData.message.trim().length < 10)
+      errors.message = "Message must be at least 10 characters";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setSubmitSuccess(true);
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          department: "",
+          message: "",
+          preferredContact: "email",
+        });
+        setSubmitSuccess(false);
+      }, 3000);
+    }, 2000);
+  };
+
   return (
-    <>
-      <section class="bg-linear-to-br from-blue-600 to-green-400 text-white py-20">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6">Get in Touch</h2>
-                <p class="text-xl mb-8 text-blue-100">We're here to help you with all your healthcare needs. Reach out to us anytime.</p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button class="bg-white text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200">
-                        <i class="fas fa-phone mr-2"></i>Call Us Now
-                    </button>
-                    <button class="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200">
-                        <i class="fas fa-envelope mr-2"></i>Send Email
-                    </button>
-                </div>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="relative bg-linear-to-r from-blue-600 to-indigo-700 text-white py-20">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              Get In Touch
+            </h1>
+            <p className="text-xl text-blue-100 mb-8">
+              Have questions? We're here to help. Contact us through any of the
+              channels below or fill out our contact form.
+            </p>
+          </div>
         </div>
-    </section>
+      </section>
 
-    {/* <!-- Contact Information Cards --> */}
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                {/* <!-- Phone Contact --> */}
-                <div class="bg-gray-50 rounded-xl p-8 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-blue-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-phone text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Phone Support</h3>
-                    <p class="text-gray-600 mb-4">Call us for immediate assistance</p>
-                    <div class="space-y-2">
-                        <p class="text-lg font-semibold text-gray-900">+1 234 567 8900</p>
-                        <p class="text-sm text-gray-600">Mon-Fri: 8AM-8PM</p>
-                        <p class="text-sm text-gray-600">Sat-Sun: 9AM-6PM</p>
-                    </div>
-                    <button class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-                        <i class="fas fa-phone mr-2"></i>Call Now
-                    </button>
+      {/* Contact Info Cards */}
+      <section className="py-12 -mt-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {contactInfo.map((info, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+              >
+                <div
+                  className={`bg-linear-to-r ${info.color} p-6 text-white`}
+                >
+                  <div className="inline-flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl mb-4">
+                    <info.icon className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-2xl font-bold">{info.title}</h3>
                 </div>
-
-                {/* <!-- Email Contact --> */}
-                <div class="bg-gray-50 rounded-xl p-8 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-envelope text-green-600 text-2xl"></i>
+                <div className="p-6 space-y-3">
+                  {info.details.map((detail, idx) => (
+                    <div key={idx}>
+                      <p className="text-xs text-gray-500 mb-1">
+                        {detail.label}
+                      </p>
+                      <p className="font-semibold text-gray-900">
+                        {detail.value}
+                      </p>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Email Support</h3>
-                    <p class="text-gray-600 mb-4">Send us an email for detailed inquiries</p>
-                    <div class="space-y-2">
-                        <p class="text-lg font-semibold text-gray-900">info@medicare.com</p>
-                        <p class="text-sm text-gray-600">support@medicare.com</p>
-                        <p class="text-sm text-gray-600">Response within 24 hours</p>
-                    </div>
-                    <button class="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-                        <i class="fas fa-envelope mr-2"></i>Send Email
-                    </button>
+                  ))}
                 </div>
-
-                {/* <!-- Location --> */}
-                <div class="bg-gray-50 rounded-xl p-8 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-purple-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-map-marker-alt text-purple-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Visit Us</h3>
-                    <p class="text-gray-600 mb-4">Come visit our main office</p>
-                    <div class="space-y-2">
-                        <p class="text-lg font-semibold text-gray-900">123 Medical Street</p>
-                        <p class="text-sm text-gray-600">Healthcare District, City</p>
-                        <p class="text-sm text-gray-600">State 12345, USA</p>
-                    </div>
-                    <button class="mt-6 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-                        <i class="fas fa-directions mr-2"></i>Get Directions
-                    </button>
-                </div>
-            </div>
+              </div>
+            ))}
+          </div>
         </div>
-    </section>
+      </section>
 
-    {/* <!-- Contact Form and Map --> */}
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
-                {/* <!-- Contact Form --> */}
-                <div class="bg-white rounded-xl shadow-lg p-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
-                    <form class="space-y-6" onsubmit="handleSubmit(event)">
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                                <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John"></input>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                                <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Doe"></input>
-                            </div>
+      {/* Main Content */}
+      <section className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Contact Form */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-2xl shadow-md p-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                  Send Us a Message
+                </h2>
+
+                {!submitSuccess ? (
+                  <form onSubmit={handleSubmit}>
+                    <div className="space-y-6">
+                      {/* Name and Email */}
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Full Name *
+                          </label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="text"
+                              name="name"
+                              value={formData.name}
+                              onChange={handleInputChange}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.name
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                              placeholder="John Doe"
+                            />
+                          </div>
+                          {formErrors.name && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.name}
+                            </p>
+                          )}
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                            <input type="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="john@example.com"></input>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address *
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="email"
+                              name="email"
+                              value={formData.email}
+                              onChange={handleInputChange}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.email
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                              placeholder="john@example.com"
+                            />
+                          </div>
+                          {formErrors.email && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.email}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Phone and Department */}
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number *
+                          </label>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="tel"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleInputChange}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.phone
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                              placeholder="+1 (555) 123-4567"
+                            />
+                          </div>
+                          {formErrors.phone && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.phone}
+                            </p>
+                          )}
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                            <input type="tel" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="+1 234 567 8900"></input>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Select a subject</option>
-                                <option value="appointment">Appointment Inquiry</option>
-                                <option value="billing">Billing Question</option>
-                                <option value="technical">Technical Support</option>
-                                <option value="feedback">Feedback</option>
-                                <option value="other">Other</option>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Department *
+                          </label>
+                          <div className="relative">
+                            <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <select
+                              name="department"
+                              value={formData.department}
+                              onChange={handleInputChange}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.department
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                            >
+                              <option value="">Select Department</option>
+                              {departments.map((dept, idx) => (
+                                <option key={idx} value={dept}>
+                                  {dept}
+                                </option>
+                              ))}
                             </select>
+                          </div>
+                          {formErrors.department && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.department}
+                            </p>
+                          )}
                         </div>
+                      </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                            <textarea rows="6" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tell us how we can help you..."></textarea>
+                      {/* Subject */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Subject *
+                        </label>
+                        <div className="relative">
+                          <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <input
+                            type="text"
+                            name="subject"
+                            value={formData.subject}
+                            onChange={handleInputChange}
+                            className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              formErrors.subject
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            }`}
+                            placeholder="What is this regarding?"
+                          />
                         </div>
+                        {formErrors.subject && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {formErrors.subject}
+                          </p>
+                        )}
+                      </div>
 
-                        <div class="flex items-center">
-                            <input type="checkbox" id="newsletter" class="mr-3"></input>
-                            <label for="newsletter" class="text-sm text-gray-600">I'd like to receive health tips and updates</label>
+                      {/* Message */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Message *
+                        </label>
+                        <textarea
+                          name="message"
+                          value={formData.message}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            formErrors.message
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
+                          placeholder="Tell us more about your inquiry..."
+                          rows="6"
+                        />
+                        {formErrors.message && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {formErrors.message}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Preferred Contact Method */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Preferred Contact Method
+                        </label>
+                        <div className="flex gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="preferredContact"
+                              value="email"
+                              checked={formData.preferredContact === "email"}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-gray-700">Email</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="preferredContact"
+                              value="phone"
+                              checked={formData.preferredContact === "phone"}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-gray-700">Phone</span>
+                          </label>
                         </div>
+                      </div>
 
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
-                            <i class="fas fa-paper-plane mr-2"></i>Send Message
-                        </button>
-                    </form>
-                </div>
-
-                {/* <!-- Map and Office Hours --> */}
-                <div class="space-y-8">
-                    {/* <!-- Map --> */}
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div class="h-96 bg-gray-200 relative">
-                            {/* <!-- Placeholder for map --> */}
-                            <div class="absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-100 to-green-100">
-                                <div class="text-center">
-                                    <i class="fas fa-map-marked-alt text-6xl text-blue-600 mb-4"></i>
-                                    <p class="text-gray-700 font-medium">Interactive Map</p>
-                                    <p class="text-sm text-gray-600">123 Medical Street, Healthcare District</p>
-                                </div>
-                            </div>
-                        </div>
+                      {/* Submit Button */}
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-semibold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-5 h-5" />
+                            Send Message
+                          </>
+                        )}
+                      </button>
                     </div>
-
-                    {/* <!-- Office Hours --> */}
-                    <div class="bg-white rounded-xl shadow-lg p-8">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6">Office Hours</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center py-3 border-b">
-                                <span class="font-medium text-gray-900">Monday - Friday</span>
-                                <span class="text-gray-600">8:00 AM - 8:00 PM</span>
-                            </div>
-                            <div class="flex justify-between items-center py-3 border-b">
-                                <span class="font-medium text-gray-900">Saturday</span>
-                                <span class="text-gray-600">9:00 AM - 6:00 PM</span>
-                            </div>
-                            <div class="flex justify-between items-center py-3 border-b">
-                                <span class="font-medium text-gray-900">Sunday</span>
-                                <span class="text-gray-600">9:00 AM - 6:00 PM</span>
-                            </div>
-                            <div class="flex justify-between items-center py-3">
-                                <span class="font-medium text-gray-900">Emergency</span>
-                                <span class="text-red-600 font-medium">24/7 Available</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle text-blue-600 mr-3"></i>
-                                <div class="text-sm text-gray-700">
-                                    <p class="font-medium">Emergency Hotline: <span class="text-blue-600">911</span></p>
-                                    <p>For medical emergencies, please call 911 immediately.</p>
-                                </div>
-                            </div>
-                        </div>
+                  </form>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                      <CheckCircle className="w-10 h-10 text-green-600" />
                     </div>
-                </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      Message Sent Successfully!
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      Thank you for contacting us. We'll get back to you within
+                      24 hours.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Quick Actions */}
+              <div className="bg-white rounded-2xl shadow-md p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Quick Actions
+                </h3>
+                <div className="space-y-3">
+                  <Link
+                    to="/doctors/appointments"
+                    className="flex items-center gap-3 p-4 bg-linear-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-lg transition-colors group"
+                  >
+                    <Calendar className="w-6 h-6 text-blue-600" />
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        Book Appointment
+                      </p>
+                      <p className="text-xs text-gray-600">Schedule online</p>
+                    </div>
+                  </Link>
+
+                  <a
+                    href="tel:+15551234568"
+                    className="flex items-center gap-3 p-4 bg-linear-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 rounded-lg transition-colors"
+                  >
+                    <PhoneCall className="w-6 h-6 text-green-600" />
+                    <div>
+                      <p className="font-semibold text-gray-900">Call Us Now</p>
+                      <p className="text-xs text-gray-600">+1 (555) 123-4568</p>
+                    </div>
+                  </a>
+
+                  <a
+                    href="#"
+                    className="flex items-center gap-3 p-4 bg-linear-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 rounded-lg transition-colors"
+                  >
+                    <MessageCircle className="w-6 h-6 text-purple-600" />
+                    <div>
+                      <p className="font-semibold text-gray-900">Live Chat</p>
+                      <p className="text-xs text-gray-600">Chat with support</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              {/* Emergency Contact */}
+              <div className="bg-linear-to-br from-red-500 to-rose-600 rounded-2xl shadow-md p-6 text-white">
+                <div className="flex items-center gap-3 mb-4">
+                  <Ambulance className="w-8 h-8" />
+                  <h3 className="text-xl font-bold">Emergency?</h3>
+                </div>
+                <p className="text-red-100 mb-4">
+                  For medical emergencies, please call 911 immediately or visit
+                  our emergency department.
+                </p>
+                <a
+                  href="tel:911"
+                  className="block w-full bg-white text-red-600 py-3 rounded-lg font-bold text-center hover:bg-red-50 transition-colors"
+                >
+                  Call 911
+                </a>
+              </div>
+
+              {/* Social Media */}
+              <div className="bg-white rounded-2xl shadow-md p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Connect With Us
+                </h3>
+                <div className="flex gap-3">
+                  {socialLinks.map((social, idx) => (
+                    <a
+                      key={idx}
+                      href={social.url}
+                      className={`flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors ${social.color}`}
+                      title={social.name}
+                    >
+                      <social.icon className="w-5 h-5" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              {/* Support Hours */}
+              <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+                <div className="flex items-center gap-2 text-blue-600 mb-3">
+                  <Headphones className="w-5 h-5" />
+                  <h3 className="font-bold text-gray-900">Support Hours</h3>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Mon - Fri:</span>
+                    <span className="font-semibold text-gray-900">
+                      8 AM - 8 PM
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Saturday:</span>
+                    <span className="font-semibold text-gray-900">
+                      9 AM - 6 PM
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Sunday:</span>
+                    <span className="font-semibold text-gray-900">
+                      10 AM - 4 PM
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
-    {/* <!-- FAQ Section --> */}
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-                <p class="text-xl text-gray-600">Find answers to common questions about our services</p>
-            </div>
+      {/* Office Locations */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Our Locations
+            </h2>
+            <p className="text-xl text-gray-600">
+              Visit us at any of our convenient locations
+            </p>
+          </div>
 
-            <div class="max-w-3xl mx-auto space-y-4">
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <button class="w-full text-left flex justify-between items-center" onclick="toggleFAQ(this)">
-                        <h3 class="font-semibold text-gray-900">How do I book an appointment?</h3>
-                        <i class="fas fa-chevron-down text-gray-600 transition-transform duration-200"></i>
-                    </button>
-                    <div class="hidden mt-4 text-gray-600">
-                        <p>You can book an appointment through our website, mobile app, or by calling our support team. Simply select your preferred doctor, choose a date and time, and confirm your booking.</p>
-                    </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {locations.map((location, index) => (
+              <div
+                key={index}
+                className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow border border-gray-200"
+              >
+                <div className="flex items-start gap-3 mb-4">
+                  <MapPinned className="w-6 h-6 text-blue-600 shrink-0 mt-1" />
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {location.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-3">
+                      {location.address}
+                    </p>
+                  </div>
                 </div>
 
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <button class="w-full text-left flex justify-between items-center" onclick="toggleFAQ(this)">
-                        <h3 class="font-semibold text-gray-900">What insurance plans do you accept?</h3>
-                        <i class="fas fa-chevron-down text-gray-600 transition-transform duration-200"></i>
-                    </button>
-                    <div class="hidden mt-4 text-gray-600">
-                        <p>We accept most major insurance plans including Medicare, Medicaid, and private insurance. Please contact our billing department to verify your specific coverage.</p>
-                    </div>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Phone className="w-4 h-4" />
+                    <span>{location.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="w-4 h-4" />
+                    <span>{location.hours}</span>
+                  </div>
                 </div>
 
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <button class="w-full text-left flex justify-between items-center" onclick="toggleFAQ(this)">
-                        <h3 class="font-semibold text-gray-900">Do you offer video consultations?</h3>
-                        <i class="fas fa-chevron-down text-gray-600 transition-transform duration-200"></i>
-                    </button>
-                    <div class="hidden mt-4 text-gray-600">
-                        <p>Yes, we offer secure video consultations for many types of appointments. You can schedule a virtual visit through our platform and connect with your doctor from home.</p>
-                    </div>
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 mb-2">
+                    SERVICES AVAILABLE
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {location.services.map((service, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full"
+                      >
+                        {service}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <button class="w-full text-left flex justify-between items-center" onclick="toggleFAQ(this)">
-                        <h3 class="font-semibold text-gray-900">How can I access my medical records?</h3>
-                        <i class="fas fa-chevron-down text-gray-600 transition-transform duration-200"></i>
-                    </button>
-                    <div class="hidden mt-4 text-gray-600">
-                        <p>Your medical records are available through our secure patient portal. You can log in to view test results, prescription history, and download your records anytime.</p>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <button class="w-full text-left flex justify-between items-center" onclick="toggleFAQ(this)">
-                        <h3 class="font-semibold text-gray-900">What should I do in case of an emergency?</h3>
-                        <i class="fas fa-chevron-down text-gray-600 transition-transform duration-200"></i>
-                    </button>
-                    <div class="hidden mt-4 text-gray-600">
-                        <p>In case of a medical emergency, please call 911 immediately or go to the nearest emergency room. For urgent but non-life-threatening issues, you can call our emergency hotline.</p>
-                    </div>
-                </div>
-            </div>
+                <button className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition-colors">
+                  <Navigation className="w-4 h-4" />
+                  Get Directions
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-    </section>
+      </section>
 
-    {/* <!-- Social Media Section --> */}
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">Connect With Us</h2>
-            <p class="text-xl text-gray-600 mb-8">Follow us on social media for health tips and updates</p>
-            
-            <div class="flex justify-center space-x-6 mb-8">
-                <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-200">
-                    <i class="fab fa-facebook-f text-2xl"></i>
-                </a>
-                <a href="#" class="bg-blue-400 hover:bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-200">
-                    <i class="fab fa-twitter text-2xl"></i>
-                </a>
-                <a href="#" class="bg-pink-600 hover:bg-pink-700 text-white w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-200">
-                    <i class="fab fa-instagram text-2xl"></i>
-                </a>
-                <a href="#" class="bg-blue-700 hover:bg-blue-800 text-white w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-200">
-                    <i class="fab fa-linkedin-in text-2xl"></i>
-                </a>
-                <a href="#" class="bg-red-600 hover:bg-red-700 text-white w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-200">
-                    <i class="fab fa-youtube text-2xl"></i>
-                </a>
+      {/* Map Section */}
+      <section className="py-0">
+        <div className="w-full h-96 bg-gray-200 relative overflow-hidden">
+          {/* Placeholder for Google Maps */}
+          <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-100 to-indigo-100">
+            <div className="text-center">
+              <MapPin className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+              <p className="text-gray-700 font-semibold">Interactive Map</p>
+              <p className="text-sm text-gray-600">Google Maps Integration</p>
             </div>
-
-            <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Subscribe to Our Newsletter</h3>
-                <p class="text-gray-600 mb-6">Get health tips, medical news, and exclusive offers delivered to your inbox</p>
-                <form class="flex flex-col sm:flex-row gap-4" onsubmit="handleNewsletter(event)">
-                    <input type="email" required placeholder="Enter your email address" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></input>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-                        Subscribe
-                    </button>
-                </form>
-            </div>
+          </div>
         </div>
-    </section>
-    </>
-  )
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-gray-600">
+              Find answers to common questions
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl shadow-md overflow-hidden"
+              >
+                <button
+                  onClick={() =>
+                    setExpandedFaq(expandedFaq === index ? null : index)
+                  }
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors"
+                >
+                  <span className="font-semibold text-gray-900 pr-4">
+                    {faq.question}
+                  </span>
+                  {expandedFaq === index ? (
+                    <ChevronUp className="w-5 h-5 text-blue-600 shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400 shrink-0" />
+                  )}
+                </button>
+                {expandedFaq === index && (
+                  <div className="px-6 pb-6">
+                    <p className="text-gray-700 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 mb-4">Still have questions?</p>
+            <a
+              href="#contact-form"
+              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold"
+            >
+              Contact our support team
+              <ChevronDown className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }
 
-export default Contact
+export default Contact;

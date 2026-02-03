@@ -1,458 +1,755 @@
-import React from 'react'
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Stethoscope,
+  Heart,
+  Brain,
+  Activity,
+  Eye,
+  Bone,
+  Baby,
+  Microscope,
+  Syringe,
+  FlaskConical,
+  Pill,
+  Scissors,
+  Smartphone,
+  FileText,
+  Clock,
+  Shield,
+  Award,
+  Users,
+  TrendingUp,
+  Video,
+  Home,
+  Ambulance,
+  HeartPulse,
+  TestTube,
+  ScanLine,
+  Monitor,
+  Thermometer,
+  Bandage,
+  CheckCircle,
+  ChevronRight,
+  Star,
+  Calendar,
+  Phone,
+  Mail,
+  MapPin,
+  DollarSign,
+  Zap,
+  Sparkles,
+} from "lucide-react";
 
 function Services() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [expandedService, setExpandedService] = useState(null);
+
+  // Service categories
+  const categories = [
+    { name: "All", icon: Stethoscope },
+    { name: "Diagnostics", icon: Microscope },
+    { name: "Treatments", icon: Heart },
+    { name: "Surgery", icon: Scissors },
+    { name: "Emergency", icon: Ambulance },
+    { name: "Digital Health", icon: Smartphone },
+  ];
+
+  // Main services
+  const services = [
+    {
+      id: 1,
+      category: "Diagnostics",
+      icon: Microscope,
+      title: "Advanced Laboratory Testing",
+      shortDescription:
+        "Comprehensive diagnostic tests with fast, accurate results",
+      fullDescription:
+        "Our state-of-the-art laboratory offers a complete range of diagnostic tests including blood work, urinalysis, microbiology, and specialized testing. Results typically available within 24-48 hours.",
+      features: [
+        "Complete blood count (CBC)",
+        "Metabolic panels",
+        "Hormone testing",
+        "Allergy testing",
+        "COVID-19 & infectious disease testing",
+        "Genetic testing",
+      ],
+      price: "Starting at $50",
+      duration: "15-30 minutes",
+      availability: "24/7",
+      color: "from-blue-500 to-cyan-500",
+      bgColor: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
+    {
+      id: 2,
+      category: "Diagnostics",
+      icon: ScanLine,
+      title: "Medical Imaging",
+      shortDescription: "Advanced imaging technology for accurate diagnosis",
+      fullDescription:
+        "Our imaging center features the latest technology including MRI, CT scans, X-rays, ultrasound, and mammography. All scans are reviewed by board-certified radiologists.",
+      features: [
+        "MRI & CT scans",
+        "Digital X-rays",
+        "3D Mammography",
+        "Ultrasound imaging",
+        "Bone density scans",
+        "Same-day appointments available",
+      ],
+      price: "Varies by scan type",
+      duration: "30-60 minutes",
+      availability: "Mon-Sat, 8 AM - 8 PM",
+      color: "from-purple-500 to-pink-500",
+      bgColor: "bg-purple-50",
+      iconColor: "text-purple-600",
+    },
+    {
+      id: 3,
+      category: "Treatments",
+      icon: Heart,
+      title: "Cardiology Services",
+      shortDescription: "Comprehensive heart care from prevention to treatment",
+      fullDescription:
+        "Our cardiology department provides complete cardiovascular care including preventive screenings, diagnostic testing, and advanced treatments for heart conditions.",
+      features: [
+        "Echocardiography",
+        "Stress testing",
+        "Holter monitoring",
+        "Cardiac catheterization",
+        "Pacemaker implantation",
+        "Heart disease management",
+      ],
+      price: "Consultation: $150",
+      duration: "45-60 minutes",
+      availability: "Mon-Fri, 9 AM - 5 PM",
+      color: "from-red-500 to-orange-500",
+      bgColor: "bg-red-50",
+      iconColor: "text-red-600",
+    },
+    {
+      id: 4,
+      category: "Treatments",
+      icon: Brain,
+      title: "Neurology Care",
+      shortDescription: "Expert treatment for neurological conditions",
+      fullDescription:
+        "Specialized care for brain and nervous system disorders including headaches, epilepsy, Parkinson's disease, multiple sclerosis, and stroke recovery.",
+      features: [
+        "EEG & EMG testing",
+        "Stroke prevention & treatment",
+        "Epilepsy management",
+        "Headache & migraine treatment",
+        "Movement disorder care",
+        "Memory clinic services",
+      ],
+      price: "Consultation: $140",
+      duration: "60 minutes",
+      availability: "Mon-Fri, 8 AM - 6 PM",
+      color: "from-indigo-500 to-blue-500",
+      bgColor: "bg-indigo-50",
+      iconColor: "text-indigo-600",
+    },
+    {
+      id: 5,
+      category: "Surgery",
+      icon: Scissors,
+      title: "Minimally Invasive Surgery",
+      shortDescription: "Advanced surgical procedures with faster recovery",
+      fullDescription:
+        "Our surgical team specializes in minimally invasive techniques including laparoscopic and robotic surgery, offering less pain, shorter hospital stays, and quicker recovery times.",
+      features: [
+        "Laparoscopic surgery",
+        "Robotic-assisted procedures",
+        "Arthroscopic surgery",
+        "Endoscopic procedures",
+        "Same-day surgery options",
+        "Comprehensive pre & post-op care",
+      ],
+      price: "Varies by procedure",
+      duration: "1-4 hours",
+      availability: "Mon-Fri, scheduled",
+      color: "from-green-500 to-emerald-500",
+      bgColor: "bg-green-50",
+      iconColor: "text-green-600",
+    },
+    {
+      id: 6,
+      category: "Treatments",
+      icon: Bone,
+      title: "Orthopedic Care",
+      shortDescription: "Complete musculoskeletal treatment and rehabilitation",
+      fullDescription:
+        "Comprehensive orthopedic services including sports medicine, joint replacement, fracture care, and rehabilitation for all bone and joint conditions.",
+      features: [
+        "Joint replacement surgery",
+        "Sports injury treatment",
+        "Fracture care",
+        "Arthritis management",
+        "Physical therapy",
+        "Custom bracing & orthotics",
+      ],
+      price: "Consultation: $130",
+      duration: "45 minutes",
+      availability: "Mon-Sat, 8 AM - 6 PM",
+      color: "from-orange-500 to-amber-500",
+      bgColor: "bg-orange-50",
+      iconColor: "text-orange-600",
+    },
+    {
+      id: 7,
+      category: "Emergency",
+      icon: Ambulance,
+      title: "24/7 Emergency Care",
+      shortDescription: "Round-the-clock emergency medical services",
+      fullDescription:
+        "Our emergency department is staffed 24/7 with board-certified emergency physicians and trauma specialists ready to handle any medical emergency.",
+      features: [
+        "Immediate medical attention",
+        "Trauma care center",
+        "Pediatric emergency services",
+        "Cardiac emergency response",
+        "Advanced life support",
+        "Emergency surgery capabilities",
+      ],
+      price: "Insurance dependent",
+      duration: "Immediate care",
+      availability: "24/7/365",
+      color: "from-red-600 to-rose-600",
+      bgColor: "bg-red-50",
+      iconColor: "text-red-700",
+    },
+    {
+      id: 8,
+      category: "Digital Health",
+      icon: Video,
+      title: "Telemedicine Services",
+      shortDescription: "Virtual consultations from the comfort of your home",
+      fullDescription:
+        "Connect with our doctors via secure video consultations for non-emergency medical concerns, follow-up visits, and prescription refills.",
+      features: [
+        "Video consultations",
+        "E-prescriptions",
+        "Digital health records",
+        "Secure messaging",
+        "Remote monitoring",
+        "Available 7 days a week",
+      ],
+      price: "Starting at $75",
+      duration: "15-30 minutes",
+      availability: "Daily, 7 AM - 10 PM",
+      color: "from-cyan-500 to-blue-500",
+      bgColor: "bg-cyan-50",
+      iconColor: "text-cyan-600",
+    },
+    {
+      id: 9,
+      category: "Treatments",
+      icon: Baby,
+      title: "Pediatric Care",
+      shortDescription:
+        "Comprehensive healthcare for infants, children, and teens",
+      fullDescription:
+        "Specialized care for children from newborn to adolescence including well-child visits, immunizations, and treatment of acute and chronic conditions.",
+      features: [
+        "Well-child checkups",
+        "Immunizations",
+        "Growth & development monitoring",
+        "Sick visits",
+        "ADHD & behavioral health",
+        "Sports physicals",
+      ],
+      price: "Consultation: $100",
+      duration: "30-45 minutes",
+      availability: "Mon-Fri, 8 AM - 6 PM",
+      color: "from-pink-500 to-rose-500",
+      bgColor: "bg-pink-50",
+      iconColor: "text-pink-600",
+    },
+    {
+      id: 10,
+      category: "Diagnostics",
+      icon: Eye,
+      title: "Ophthalmology Services",
+      shortDescription: "Complete eye care and vision services",
+      fullDescription:
+        "Comprehensive eye examinations, treatment of eye diseases, LASIK surgery, cataract surgery, and contact lens fittings.",
+      features: [
+        "Comprehensive eye exams",
+        "Cataract surgery",
+        "LASIK & refractive surgery",
+        "Glaucoma treatment",
+        "Retinal care",
+        "Contact lens fittings",
+      ],
+      price: "Exam: $120",
+      duration: "45-60 minutes",
+      availability: "Mon-Fri, 9 AM - 5 PM",
+      color: "from-teal-500 to-cyan-500",
+      bgColor: "bg-teal-50",
+      iconColor: "text-teal-600",
+    },
+    {
+      id: 11,
+      category: "Digital Health",
+      icon: Smartphone,
+      title: "Health Monitoring App",
+      shortDescription: "Track your health metrics with our mobile app",
+      fullDescription:
+        "Our mobile app allows you to track vital signs, medications, appointments, and communicate with your healthcare team all in one place.",
+      features: [
+        "Vital signs tracking",
+        "Medication reminders",
+        "Appointment scheduling",
+        "Lab results access",
+        "Secure messaging with providers",
+        "Health goal setting",
+      ],
+      price: "Free for patients",
+      duration: "On-demand",
+      availability: "24/7",
+      color: "from-violet-500 to-purple-500",
+      bgColor: "bg-violet-50",
+      iconColor: "text-violet-600",
+    },
+    {
+      id: 12,
+      category: "Treatments",
+      icon: Activity,
+      title: "Physical Therapy",
+      shortDescription: "Rehabilitation and recovery services",
+      fullDescription:
+        "Our licensed physical therapists provide personalized treatment plans to help you recover from injuries, surgery, or chronic conditions.",
+      features: [
+        "Post-surgical rehabilitation",
+        "Sports injury recovery",
+        "Pain management",
+        "Mobility improvement",
+        "Strength training",
+        "Balance & fall prevention",
+      ],
+      price: "Session: $80",
+      duration: "45-60 minutes",
+      availability: "Mon-Fri, 7 AM - 7 PM",
+      color: "from-lime-500 to-green-500",
+      bgColor: "bg-lime-50",
+      iconColor: "text-lime-600",
+    },
+  ];
+
+  // Filter services by category
+  const filteredServices =
+    selectedCategory === "All"
+      ? services
+      : services.filter((service) => service.category === selectedCategory);
+
+  // Stats
+  const stats = [
+    { icon: Users, number: "10K+", label: "Patients Served Monthly" },
+    { icon: Award, number: "50+", label: "Medical Specialties" },
+    { icon: Clock, number: "24/7", label: "Emergency Care" },
+    { icon: Star, number: "4.9", label: "Patient Rating" },
+  ];
+
+  // Why choose our services
+  const whyChooseUs = [
+    {
+      icon: Shield,
+      title: "Advanced Technology",
+      description: "State-of-the-art medical equipment and facilities",
+    },
+    {
+      icon: Users,
+      title: "Expert Team",
+      description: "Board-certified physicians and specialists",
+    },
+    {
+      icon: Clock,
+      title: "Quick Access",
+      description: "Same-day and next-day appointments available",
+    },
+    {
+      icon: Heart,
+      title: "Patient-Centered Care",
+      description: "Personalized treatment plans for every patient",
+    },
+    {
+      icon: DollarSign,
+      title: "Affordable Pricing",
+      description: "Transparent pricing and insurance accepted",
+    },
+    {
+      icon: Zap,
+      title: "Fast Results",
+      description: "Quick turnaround on tests and diagnostics",
+    },
+  ];
+
   return (
-    <>
-      <section class="bg-linear-to-br from-blue-600 to-green-400 text-white py-20">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6">Comprehensive Healthcare Services</h2>
-                <p class="text-xl mb-8 text-blue-100">Access quality medical care with our wide range of healthcare services designed to meet all your needs</p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button class="bg-white text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200">
-                        <i class="fas fa-calendar-plus mr-2"></i>Book Appointment
-                    </button>
-                    <button class="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200">
-                        <i class="fas fa-phone mr-2"></i>Call Us Now
-                    </button>
-                </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="relative bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-20">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                Comprehensive Healthcare Services
+              </span>
             </div>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              World-Class Medical Services
+            </h1>
+            <p className="text-xl text-blue-100 mb-8">
+              From routine checkups to advanced treatments, we provide
+              comprehensive healthcare services using the latest medical
+              technology
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/doctors/appointments"
+                className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              >
+                <Calendar className="w-5 h-5" />
+                Book a Service
+              </Link>
+              <a
+                href="#services"
+                className="inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all border-2 border-white/50"
+              >
+                Explore Services
+                <ChevronRight className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
-    {/* <!-- Services Categories --> */}
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Service Categories</h2>
-                <p class="text-xl text-gray-600">Choose from our comprehensive range of medical services</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {/* <!-- Online Consultation --> */}
-                <div class="group bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300 hover:border-blue-300">
-                    <div class="bg-blue-100 rounded-lg w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
-                        <i class="fas fa-video text-blue-600 text-2xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Online Consultation</h3>
-                    <p class="text-gray-600 mb-6">Connect with experienced doctors remotely through secure video calls from the comfort of your home.</p>
-                    <ul class="text-gray-600 space-y-2 mb-6">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Secure video platform
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Instant doctor availability
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Digital prescriptions
-                        </li>
-                    </ul>
-                    <button class="text-blue-600 font-medium hover:text-blue-700 group-hover:text-blue-700 transition-colors">
-                        Learn More <i class="fas fa-arrow-right ml-1"></i>
-                    </button>
+      {/* Stats Section */}
+      <section className="py-12 bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-100 rounded-full mb-3">
+                  <stat.icon className="w-7 h-7 text-blue-600" />
                 </div>
-
-                {/* <!-- Emergency Care --> */}
-                <div class="group bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300 hover:border-red-300">
-                    <div class="bg-red-100 rounded-lg w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-red-600 transition-colors duration-300">
-                        <i class="fas fa-ambulance text-red-600 text-2xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Emergency Care</h3>
-                    <p class="text-gray-600 mb-6">24/7 emergency medical services with rapid response and critical care facilities.</p>
-                    <ul class="text-gray-600 space-y-2 mb-6">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            24/7 availability
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Critical care specialists
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Ambulance services
-                        </li>
-                    </ul>
-                    <button class="text-blue-600 font-medium hover:text-blue-700 group-hover:text-blue-700 transition-colors">
-                        Learn More <i class="fas fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
-
-                {/* <!-- Health Checkup --> */}
-                <div class="group bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300 hover:border-green-300">
-                    <div class="bg-green-100 rounded-lg w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors duration-300">
-                        <i class="fas fa-heartbeat text-green-600 text-2xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Health Checkup</h3>
-                    <p class="text-gray-600 mb-6">Comprehensive health screening packages for early detection and prevention of diseases.</p>
-                    <ul class="text-gray-600 space-y-2 mb-6">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Full body checkup
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Specialized packages
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Expert consultation
-                        </li>
-                    </ul>
-                    <button class="text-blue-600 font-medium hover:text-blue-700 group-hover:text-blue-700 transition-colors">
-                        Learn More <i class="fas fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
-
-                {/* <!-- Medical Records --> */}
-                <div class="group bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300 hover:border-purple-300">
-                    <div class="bg-purple-100 rounded-lg w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-purple-600 transition-colors duration-300">
-                        <i class="fas fa-file-medical text-purple-600 text-2xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Medical Records</h3>
-                    <p class="text-gray-600 mb-6">Secure digital storage and easy access to your complete medical history and reports.</p>
-                    <ul class="text-gray-600 space-y-2 mb-6">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Cloud storage
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Easy sharing
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            HIPAA compliant
-                        </li>
-                    </ul>
-                    <button class="text-blue-600 font-medium hover:text-blue-700 group-hover:text-blue-700 transition-colors">
-                        Learn More <i class="fas fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
-
-                {/* <!-- Pharmacy --> */}
-                <div class="group bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300 hover:border-orange-300">
-                    <div class="bg-orange-100 rounded-lg w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-orange-600 transition-colors duration-300">
-                        <i class="fas fa-pills text-orange-600 text-2xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Pharmacy Services</h3>
-                    <p class="text-gray-600 mb-6">Online pharmacy with home delivery of medicines and health products.</p>
-                    <ul class="text-gray-600 space-y-2 mb-6">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Home delivery
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Prescription upload
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Discount offers
-                        </li>
-                    </ul>
-                    <button class="text-blue-600 font-medium hover:text-blue-700 group-hover:text-blue-700 transition-colors">
-                        Learn More <i class="fas fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
-
-                {/* <!-- Lab Tests --> */}
-                <div class="group bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300 hover:border-indigo-300">
-                    <div class="bg-indigo-100 rounded-lg w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors duration-300">
-                        <i class="fas fa-vial text-indigo-600 text-2xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Lab Tests</h3>
-                    <p class="text-gray-600 mb-6">Comprehensive diagnostic and pathology services with accurate results.</p>
-                    <ul class="text-gray-600 space-y-2 mb-6">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Home sample collection
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            Online reports
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-2"></i>
-                            NABL accredited
-                        </li>
-                    </ul>
-                    <button class="text-blue-600 font-medium hover:text-blue-700 group-hover:text-blue-700 transition-colors">
-                        Learn More <i class="fas fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
-            </div>
+                <p className="text-3xl font-bold text-gray-900 mb-1">
+                  {stat.number}
+                </p>
+                <p className="text-gray-600">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
-    </section>
+      </section>
 
-    {/* <!-- Specialized Services --> */}
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Specialized Medical Services</h2>
-                <p class="text-xl text-gray-600">Expert care across various medical specialties</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* <!-- Cardiology --> */}
-                <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-red-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-heartbeat text-red-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Cardiology</h3>
-                    <p class="text-gray-600 text-sm mb-4">Heart and cardiovascular care</p>
-                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700">View Details</button>
-                </div>
-
-                {/* <!-- Neurology --> */}
-                <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-green-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-brain text-green-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Neurology</h3>
-                    <p class="text-gray-600 text-sm mb-4">Brain and nervous system</p>
-                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700">View Details</button>
-                </div>
-
-                {/* <!-- Orthopedics --> */}
-                <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-orange-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-bone text-orange-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Orthopedics</h3>
-                    <p class="text-gray-600 text-sm mb-4">Bone and joint care</p>
-                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700">View Details</button>
-                </div>
-
-                {/* <!-- Pediatrics --> */}
-                <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-purple-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-baby text-purple-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Pediatrics</h3>
-                    <p class="text-gray-600 text-sm mb-4">Child healthcare</p>
-                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700">View Details</button>
-                </div>
-
-                {/* <!-- Gynecology --> */}
-                <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-pink-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-female text-pink-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Gynecology</h3>
-                    <p class="text-gray-600 text-sm mb-4">Women's health</p>
-                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700">View Details</button>
-                </div>
-
-                {/* <!-- Dermatology --> */}
-                <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-blue-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-hand-holding-heart text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Dermatology</h3>
-                    <p class="text-gray-600 text-sm mb-4">Skin and hair care</p>
-                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700">View Details</button>
-                </div>
-
-                {/* <!-- Ophthalmology --> */}
-                <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-indigo-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-eye text-indigo-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Ophthalmology</h3>
-                    <p class="text-gray-600 text-sm mb-4">Eye care and vision</p>
-                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700">View Details</button>
-                </div>
-
-                {/* <!-- ENT --> */}
-                <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-teal-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-head-side-mask text-teal-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-2">ENT</h3>
-                    <p class="text-gray-600 text-sm mb-4">Ear, nose, throat care</p>
-                    <button class="text-blue-600 font-medium text-sm hover:text-blue-700">View Details</button>
-                </div>
-            </div>
+      {/* Category Filter */}
+      <section
+        className="py-8 bg-gray-50 sticky top-0 z-40 border-b bg-white-50 backdrop-blur-sm"
+        id="services"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-gray-900">Our Services</h2>
+            <p className="text-gray-600">{filteredServices.length} services</p>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {categories.map((category) => (
+              <button
+                key={category.name}
+                onClick={() => setSelectedCategory(category.name)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${
+                  selectedCategory === category.name
+                    ? "bg-blue-600 text-white shadow-lg scale-105"
+                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                }`}
+              >
+                <category.icon className="w-5 h-5" />
+                {category.name}
+              </button>
+            ))}
+          </div>
         </div>
-    </section>
+      </section>
 
-    {/* <!-- Service Process --> */}
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">How Our Services Work</h2>
-                <p class="text-xl text-gray-600">Simple steps to access quality healthcare</p>
-            </div>
+      {/* Services Grid */}
+      <section className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredServices.map((service) => (
+              <div
+                key={service.id}
+                className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+              >
+                {/* Service Header */}
+                <div
+                  className={`bg-linear-to-r ${service.color} p-6 text-white relative overflow-hidden`}
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                  <div className="relative">
+                    <div className="inline-flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl mb-4">
+                      <service.icon className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
+                    <p className="text-white/90">{service.shortDescription}</p>
+                  </div>
+                </div>
 
-            <div class="grid md:grid-cols-4 gap-8">
-                <div class="text-center">
-                    <div class="bg-blue-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-search text-blue-600 text-2xl"></i>
+                {/* Service Content */}
+                <div className="p-6">
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm">{service.duration}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <DollarSign className="w-4 h-4" />
+                        <span className="text-sm font-semibold">
+                          {service.price}
+                        </span>
+                      </div>
                     </div>
-                    <h3 class="font-bold text-gray-900 mb-3">1. Find Service</h3>
-                    <p class="text-gray-600">Browse our comprehensive range of healthcare services and choose what you need</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-calendar-check text-green-600 text-2xl"></i>
+                    <div className="flex items-center gap-2 text-gray-600 mb-4">
+                      <Calendar className="w-4 h-4" />
+                      <span className="text-sm">{service.availability}</span>
                     </div>
-                    <h3 class="font-bold text-gray-900 mb-3">2. Book Appointment</h3>
-                    <p class="text-gray-600">Schedule your appointment at your preferred time and date</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-purple-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-user-md text-purple-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-3">3. Consultation</h3>
-                    <p class="text-gray-600">Connect with our expert doctors for your consultation</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-orange-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-file-medical text-orange-600 text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900 mb-3">4. Get Care</h3>
-                    <p class="text-gray-600">Receive your treatment plan and follow-up care</p>
-                </div>
-            </div>
-        </div>
-    </section>
+                  </div>
 
-    {/* <!-- Pricing Plans --> */}
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Service Packages</h2>
-                <p class="text-xl text-gray-600">Choose the perfect plan for your healthcare needs</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                {/* <!-- Basic Plan --> */}
-                <div class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
-                    <div class="text-center mb-6">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Basic</h3>
-                        <div class="text-4xl font-bold text-gray-900 mb-2">$29<span class="text-lg text-gray-600">/month</span></div>
-                        <p class="text-gray-600">Perfect for individuals</p>
-                    </div>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-3"></i>
-                            <span>2 online consultations</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-3"></i>
-                            <span>Basic health checkup</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-3"></i>
-                            <span>Digital records</span>
-                        </li>
-                        <li class="flex items-center text-gray-400">
-                            <i class="fas fa-times text-gray-400 mr-3"></i>
-                            <span>Lab tests</span>
-                        </li>
-                        <li class="flex items-center text-gray-400">
-                            <i class="fas fa-times text-gray-400 mr-3"></i>
-                            <span>Emergency care</span>
-                        </li>
-                    </ul>
-                    <button class="w-full border border-blue-600 text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-                        Choose Basic
+                  {/* Features - Collapsible */}
+                  <div className="mb-6">
+                    <button
+                      onClick={() =>
+                        setExpandedService(
+                          expandedService === service.id ? null : service.id,
+                        )
+                      }
+                      className="flex items-center justify-between w-full text-left font-semibold text-gray-900 mb-3"
+                    >
+                      <span>Key Features</span>
+                      <ChevronRight
+                        className={`w-5 h-5 transition-transform ${expandedService === service.id ? "rotate-90" : ""}`}
+                      />
                     </button>
-                </div>
 
-                {/* <!-- Premium Plan --> */}
-                <div class="bg-blue-600 rounded-xl shadow-xl p-8 text-white transform scale-105">
-                    <div class="bg-yellow-400 text-blue-900 text-sm font-bold px-3 py-1 rounded-full inline-block mb-4">POPULAR</div>
-                    <div class="text-center mb-6">
-                        <h3 class="text-2xl font-bold mb-2">Premium</h3>
-                        <div class="text-4xl font-bold mb-2">$79<span class="text-lg text-blue-100">/month</span></div>
-                        <p class="text-blue-100">Most comprehensive care</p>
-                    </div>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-white mr-3"></i>
-                            <span>Unlimited consultations</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-white mr-3"></i>
-                            <span>Complete health checkup</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-white mr-3"></i>
-                            <span>Advanced digital records</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-white mr-3"></i>
-                            <span>Basic lab tests</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-white mr-3"></i>
-                            <span>24/7 emergency support</span>
-                        </li>
-                    </ul>
-                    <button class="w-full bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-                        Choose Premium
+                    {expandedService === service.id && (
+                      <div className="space-y-2 animate-in slide-in-from-top">
+                        <p className="text-sm text-gray-700 mb-3">
+                          {service.fullDescription}
+                        </p>
+                        {service.features.map((feature, idx) => (
+                          <div key={idx} className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                            <span className="text-sm text-gray-700">
+                              {feature}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CTA Buttons */}
+                  <div className="flex gap-3">
+                    <Link
+                      to="/doctors/appointments"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-center transition-colors"
+                    >
+                      Book Now
+                    </Link>
+                    <button className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-colors">
+                      <Phone className="w-5 h-5" />
                     </button>
+                  </div>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                {/* <!-- Family Plan --> */}
-                <div class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
-                    <div class="text-center mb-6">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Family</h3>
-                        <div class="text-4xl font-bold text-gray-900 mb-2">$149<span class="text-lg text-gray-600">/month</span></div>
-                        <p class="text-gray-600">For the whole family</p>
-                    </div>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-3"></i>
-                            <span>Family consultations</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-3"></i>
-                            <span>Family health checkups</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-3"></i>
-                            <span>Family digital records</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-3"></i>
-                            <span>All lab tests included</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-check text-green-500 mr-3"></i>
-                            <span>Priority emergency care</span>
-                        </li>
-                    </ul>
-                    <button class="w-full border border-blue-600 text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-                        Choose Family
-                    </button>
+      {/* Why Choose Us */}
+      <section className="py-20 bg-linear-to-br from-blue-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Our Services?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              We combine cutting-edge technology with compassionate care to
+              deliver exceptional healthcare services
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {whyChooseUs.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl p-8 hover:shadow-lg transition-shadow"
+              >
+                <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-100 rounded-xl mb-4">
+                  <item.icon className="w-7 h-7 text-blue-600" />
                 </div>
-            </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-gray-600">{item.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
-    </section>
+      </section>
 
-    {/* <!-- CTA Section --> */}
-    <section class="py-16 bg-linear-to-r from-blue-600 to-green-400 text-white">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6">Get Started Today</h2>
-            <p class="text-xl mb-8 text-blue-100">Join thousands of satisfied patients who trust MediCare for their healthcare needs</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button class="bg-white text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-lg font-semibold transition-colors duration-200">
-                    <i class="fas fa-user-plus mr-2"></i>Sign Up Now
-                </button>
-                <button class="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-lg font-semibold transition-colors duration-200">
-                    <i class="fas fa-phone mr-2"></i>Contact Support
-                </button>
+      {/* Insurance & Payment */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+                Insurance & Payment Options
+              </h2>
+              <p className="text-xl text-gray-600 mb-8">
+                We accept most major insurance plans and offer flexible payment
+                options to make quality healthcare accessible to everyone.
+              </p>
+
+              <div className="space-y-4 mb-8">
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
+                    <CheckCircle className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">
+                      Most Insurance Accepted
+                    </h3>
+                    <p className="text-gray-600">
+                      We work with all major insurance providers
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
+                    <DollarSign className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">
+                      Flexible Payment Plans
+                    </h3>
+                    <p className="text-gray-600">
+                      Interest-free payment options available
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
+                    <Shield className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">
+                      Transparent Pricing
+                    </h3>
+                    <p className="text-gray-600">
+                      No hidden fees or surprise charges
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-colors"
+              >
+                Contact Billing
+                <ChevronRight className="w-5 h-5" />
+              </Link>
             </div>
+
+            <div className="bg-linear-to-br from-blue-100 to-indigo-100 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                Accepted Insurance Providers
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  "Blue Cross",
+                  "Aetna",
+                  "Cigna",
+                  "UnitedHealth",
+                  "Medicare",
+                  "Medicaid",
+                  "Humana",
+                  "Kaiser",
+                ].map((provider, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white rounded-lg p-4 text-center font-semibold text-gray-700"
+                  >
+                    {provider}
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 mt-6">
+                Don't see your insurance? Contact us to verify coverage.
+              </p>
+            </div>
+          </div>
         </div>
-    </section>
-    </>
-  )
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-linear-to-r from-blue-600 to-indigo-700 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold mb-6">
+            Ready to Experience Better Healthcare?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Book an appointment today and take the first step towards better
+            health
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/doctors/appointments"
+              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              <Calendar className="w-5 h-5" />
+              Book Appointment
+            </Link>
+            <Link
+              to="/contact"
+              className="inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all border-2 border-white/50"
+            >
+              <Phone className="w-5 h-5" />
+              Contact Us
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Emergency Contact */}
+      <section className="py-8 bg-red-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Ambulance className="w-10 h-10" />
+              <div>
+                <h3 className="text-xl font-bold">24/7 Emergency Services</h3>
+                <p className="text-red-100">
+                  Immediate medical attention when you need it most
+                </p>
+              </div>
+            </div>
+            <a
+              href="tel:911"
+              className="bg-white text-red-600 px-8 py-3 rounded-lg font-bold text-lg hover:bg-red-50 transition-colors"
+            >
+              Call 911
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }
 
-export default Services
+export default Services;

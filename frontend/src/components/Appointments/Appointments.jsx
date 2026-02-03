@@ -1,373 +1,1239 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation, Link } from "react-router-dom";
+import {
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Mail,
+  MessageCircle,
+  Send,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  X,
+  MapPin,
+  FileText,
+  CreditCard,
+  Bot,
+  Video,
+  Building,
+  Users,
+  Activity,
+  ArrowLeft,
+  Download,
+  Printer,
+  Share2,
+} from "lucide-react";
 
 function Appointments() {
+  const location = useLocation();
+  const selectedDoctor = location.state?.doctor;
+
+  const [activeTab, setActiveTab] = useState("book"); // book, myAppointments, aiAssistant
+  const [showAIChat, setShowAIChat] = useState(false);
+
+  // Booking Form State
+  const [formData, setFormData] = useState({
+    patientName: "",
+    email: "",
+    phone: "",
+    age: "",
+    gender: "",
+    address: "",
+    selectedDoctor: selectedDoctor?.name || "",
+    specialty: selectedDoctor?.specialty || "",
+    appointmentDate: "",
+    appointmentTime: "",
+    appointmentType: "in-person", // in-person or video
+    reason: "",
+    symptoms: "",
+    insurance: "",
+  });
+
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookedAppointmentDetails, setBookedAppointmentDetails] =
+    useState(null);
+
+  // AI Chat State
+  const [messages, setMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  // My Appointments State
+  const [myAppointments, setMyAppointments] = useState([
+    {
+      id: "APT001",
+      doctorName: "Dr. Sarah Smith",
+      specialty: "Cardiology",
+      date: "2026-02-10",
+      time: "10:00 AM",
+      type: "Video Consultation",
+      status: "Upcoming",
+      location: "Video Call",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400",
+    },
+    {
+      id: "APT002",
+      doctorName: "Dr. Michael Johnson",
+      specialty: "Neurology",
+      date: "2026-01-28",
+      time: "2:30 PM",
+      type: "In-Person",
+      status: "Completed",
+      location: "Central Hospital",
+      image:
+        "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400",
+    },
+  ]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Initialize AI Chat
+  useEffect(() => {
+    if (activeTab === "aiAssistant" && messages.length === 0) {
+      setMessages([
+        {
+          role: "assistant",
+          content: `Hello! I'm your AI appointment booking assistant. I can help you:
+
+• Book appointments with our doctors
+• Check available time slots
+• Answer questions about our specialists
+• Reschedule existing appointments
+
+How can I assist you today?`,
+        },
+      ]);
+    }
+  }, [activeTab]);
+
+  // Available time slots
+  const timeSlots = [
+    "09:00 AM",
+    "09:30 AM",
+    "10:00 AM",
+    "10:30 AM",
+    "11:00 AM",
+    "11:30 AM",
+    "12:00 PM",
+    "02:00 PM",
+    "02:30 PM",
+    "03:00 PM",
+    "03:30 PM",
+    "04:00 PM",
+    "04:30 PM",
+    "05:00 PM",
+  ];
+
+  // Doctors list for dropdown
+  const doctors = [
+    { name: "Dr. Sarah Smith", specialty: "Cardiology" },
+    { name: "Dr. Michael Johnson", specialty: "Neurology" },
+    { name: "Dr. Emily Lee", specialty: "Dermatology" },
+    { name: "Dr. James Wilson", specialty: "Orthopedics" },
+    { name: "Dr. Olivia Martinez", specialty: "Pediatrics" },
+    { name: "Dr. David Chen", specialty: "Ophthalmology" },
+  ];
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear error for this field
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
+  // Handle doctor selection
+  const handleDoctorChange = (e) => {
+    const doctorName = e.target.value;
+    const doctor = doctors.find((d) => d.name === doctorName);
+    setFormData((prev) => ({
+      ...prev,
+      selectedDoctor: doctorName,
+      specialty: doctor?.specialty || "",
+    }));
+  };
+
+  // Validate form
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formData.patientName.trim()) errors.patientName = "Name is required";
+    if (!formData.email.trim()) errors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      errors.email = "Email is invalid";
+    if (!formData.phone.trim()) errors.phone = "Phone is required";
+    if (!formData.age) errors.age = "Age is required";
+    if (!formData.gender) errors.gender = "Gender is required";
+    if (!formData.selectedDoctor)
+      errors.selectedDoctor = "Please select a doctor";
+    if (!formData.appointmentDate) errors.appointmentDate = "Date is required";
+    if (!formData.appointmentTime) errors.appointmentTime = "Time is required";
+    if (!formData.reason.trim()) errors.reason = "Reason is required";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      const appointmentId =
+        "APT" + String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+      const newAppointment = {
+        id: appointmentId,
+        doctorName: formData.selectedDoctor,
+        specialty: formData.specialty,
+        date: formData.appointmentDate,
+        time: formData.appointmentTime,
+        type:
+          formData.appointmentType === "video"
+            ? "Video Consultation"
+            : "In-Person",
+        status: "Upcoming",
+        location:
+          formData.appointmentType === "video" ? "Video Call" : "Hospital",
+        patientName: formData.patientName,
+        image:
+          "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400",
+      };
+
+      setBookedAppointmentDetails(newAppointment);
+      setMyAppointments((prev) => [newAppointment, ...prev]);
+      setBookingSuccess(true);
+      setIsSubmitting(false);
+    }, 2000);
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      patientName: "",
+      email: "",
+      phone: "",
+      age: "",
+      gender: "",
+      address: "",
+      selectedDoctor: "",
+      specialty: "",
+      appointmentDate: "",
+      appointmentTime: "",
+      appointmentType: "in-person",
+      reason: "",
+      symptoms: "",
+      insurance: "",
+    });
+    setBookingSuccess(false);
+    setBookedAppointmentDetails(null);
+    setFormErrors({});
+  };
+
+  // AI Chat functionality
+  const callClaudeAPI = async (conversationHistory) => {
+    const systemPrompt = `You are a helpful medical appointment booking assistant for MediCare. You can:
+1. Help book appointments with doctors
+2. Provide information about available specialists
+3. Suggest appropriate doctors based on symptoms
+4. Answer questions about appointment procedures
+
+Our available doctors:
+- Dr. Sarah Smith (Cardiology)
+- Dr. Michael Johnson (Neurology)
+- Dr. Emily Lee (Dermatology)
+- Dr. James Wilson (Orthopedics)
+- Dr. Olivia Martinez (Pediatrics)
+- Dr. David Chen (Ophthalmology)
+
+Available time slots: 9:00 AM - 5:00 PM, Monday to Friday
+
+When you have gathered: patient name, preferred doctor, date, and time, respond with a JSON object:
+{
+  "booking_confirmed": true,
+  "patient_name": "John Doe",
+  "doctor": "Dr. Sarah Smith",
+  "specialty": "Cardiology",
+  "date": "2026-02-10",
+  "time": "10:00 AM",
+  "confirmation_message": "Your appointment is confirmed!"
+}
+
+Otherwise, continue the conversation naturally to gather information.`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: conversationHistory,
+        }),
+      });
+
+      const data = await response.json();
+      return data.content[0].text;
+    } catch (error) {
+      console.error("AI Error:", error);
+      return "I apologize, but I'm having trouble connecting right now. Please try again or use the booking form.";
+    }
+  };
+
+  const handleChatSend = async () => {
+    if (!chatInput.trim()) return;
+
+    const userMessage = { role: "user", content: chatInput };
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setChatInput("");
+    setIsChatLoading(true);
+
+    const conversationHistory = updatedMessages.map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
+
+    const assistantResponse = await callClaudeAPI(conversationHistory);
+
+    // Check for booking confirmation
+    try {
+      const jsonMatch = assistantResponse.match(
+        /\{[\s\S]*"booking_confirmed"[\s\S]*\}/,
+      );
+      if (jsonMatch) {
+        const bookingData = JSON.parse(jsonMatch[0]);
+        if (bookingData.booking_confirmed) {
+          const appointmentId =
+            "APT" + String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+          const newAppointment = {
+            id: appointmentId,
+            doctorName: bookingData.doctor,
+            specialty: bookingData.specialty,
+            date: bookingData.date,
+            time: bookingData.time,
+            type: "In-Person",
+            status: "Upcoming",
+            location: "Hospital",
+            patientName: bookingData.patient_name,
+            image:
+              "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400",
+          };
+          setMyAppointments((prev) => [newAppointment, ...prev]);
+        }
+      }
+    } catch (e) {
+      // Not a booking confirmation
+    }
+
+    setMessages([
+      ...updatedMessages,
+      {
+        role: "assistant",
+        content: assistantResponse,
+      },
+    ]);
+    setIsChatLoading(false);
+  };
+
+  const handleChatKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleChatSend();
+    }
+  };
+
+  // Get minimum date (today)
+  const today = new Date().toISOString().split("T")[0];
+
   return (
-    <div>
-      {/* <!-- Breadcrumb --> */}
-      <div class="bg-white border-b">
-        <div class="container mx-auto px-4 py-3">
-          <nav class="flex items-center space-x-2 text-sm">
-            <Link src="" class="text-gray-900 hover:text-blue-600">
-              Home
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4 mb-4">
+            <Link
+              to="/doctors"
+              className="hover:bg-white/20 p-2 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-6 h-6" />
             </Link>
-            <a href="" class="text-gray-600 hover:text-blue-600">
-              Doctors
-            </a>
-            <span class="text-gray-900 font-medium">Book Appointment</span>
-          </nav>
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold">
+                Book Appointment
+              </h1>
+              <p className="text-xl text-blue-100 mt-2">
+                Schedule your consultation with our expert doctors
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* <!-- Main Content --> */}
-      <main class="container mx-auto px-4 py-8">
-        <div class="grid lg:grid-cols-3 gap-8">
-          {/* <!-- Doctor Info Card --> */}
-          <div class="lg:col-span-1">
-            <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-              <div class="text-center mb-6">
-                <img
-                  src="https://picsum.photos/seed/doctor1/150/150.jpg"
-                  alt="Dr. Sarah Johnson"
-                  class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-                ></img>
-                <h2 class="text-xl font-bold text-gray-900 mb-2">
-                  Dr. Sarah Johnson
-                </h2>
-                <p class="text-blue-600 font-medium mb-2">Cardiologist</p>
-                <div class="flex items-center justify-center mb-3">
-                  <div class="flex text-yellow-400">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                  </div>
-                  <span class="text-gray-600 text-sm ml-2">
-                    (4.9) 234 reviews
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tabs */}
+        <div className="bg-white rounded-xl shadow-md mb-8">
+          <div className="border-b border-gray-200">
+            <nav className="flex -mb-px">
+              <button
+                onClick={() => setActiveTab("book")}
+                className={`flex items-center gap-2 px-6 py-4 border-b-2 font-semibold transition-colors ${
+                  activeTab === "book"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <Calendar className="w-5 h-5" />
+                Book Appointment
+              </button>
+              <button
+                onClick={() => setActiveTab("myAppointments")}
+                className={`flex items-center gap-2 px-6 py-4 border-b-2 font-semibold transition-colors ${
+                  activeTab === "myAppointments"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <Activity className="w-5 h-5" />
+                My Appointments
+                {myAppointments.length > 0 && (
+                  <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                    {myAppointments.length}
                   </span>
-                </div>
-                <p class="text-gray-600 text-sm mb-4">15 years experience</p>
-              </div>
-
-              <div class="border-t pt-4">
-                <h3 class="font-semibold text-gray-900 mb-3">
-                  Consultation Details
-                </h3>
-                <div class="space-y-3">
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">Consultation Fee</span>
-                    <span class="font-bold text-gray-900">$150</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">Duration</span>
-                    <span class="text-gray-900">30 minutes</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">Type</span>
-                    <span class="text-gray-900">Video Call</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="border-t pt-4 mt-4">
-                <h3 class="font-semibold text-gray-900 mb-3">Available</h3>
-                <div class="flex flex-wrap gap-2">
-                  <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                    <i class="fas fa-video mr-1"></i>Video Call
-                  </span>
-                  <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                    <i class="fas fa-user-md mr-1"></i>In-Person
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* <!-- Booking Form --> */}
-          <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-lg p-8">
-              <h2 class="text-2xl font-bold text-gray-900 mb-6">
-                Book Your Appointment
-              </h2>
-
-              {/* <!-- Progress Steps --> */}
-              <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center">
-                  <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-medium">
-                    1
-                  </div>
-                  <span class="ml-2 font-medium text-gray-900">
-                    Select Date & Time
-                  </span>
-                </div>
-                <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
-                <div class="flex items-center">
-                  <div class="bg-gray-200 text-gray-600 rounded-full w-8 h-8 flex items-center justify-center font-medium">
-                    2
-                  </div>
-                  <span class="ml-2 text-gray-600">Patient Details</span>
-                </div>
-                <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
-                <div class="flex items-center">
-                  <div class="bg-gray-200 text-gray-600 rounded-full w-8 h-8 flex items-center justify-center font-medium">
-                    3
-                  </div>
-                  <span class="ml-2 text-gray-600">Confirmation</span>
-                </div>
-              </div>
-
-              {/* <!-- Step 1: Date & Time Selection --> */}
-              <div class="space-y-6">
-                {/* <!-- Consultation Type --> */}
-                <div>
-                  <label class="block text-gray-900 font-medium mb-3">
-                    Consultation Type
-                  </label>
-                  <div class="grid grid-cols-2 gap-4">
-                    <label class="border-2 border-blue-600 bg-blue-50 rounded-lg p-4 cursor-pointer hover:bg-blue-100 transition-colors">
-                      <div class="flex items-center">
-                        <input
-                          type="radio"
-                          name="consultation-type"
-                          value="video"
-                          checked
-                          class="mr-3"
-                        ></input>
-                        <div>
-                          <div class="font-medium text-gray-900">
-                            Video Consultation
-                          </div>
-                          <div class="text-sm text-gray-600">
-                            Online via video call
-                          </div>
-                        </div>
-                      </div>
-                    </label>
-                    <label class="border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-blue-600 hover:bg-blue-50 transition-colors">
-                      <div class="flex items-center">
-                        <input
-                          type="radio"
-                          name="consultation-type"
-                          value="inperson"
-                          class="mr-3"
-                        ></input>
-                        <div>
-                          <div class="font-medium text-gray-900">
-                            In-Person Visit
-                          </div>
-                          <div class="text-sm text-gray-600">
-                            At clinic/hospital
-                          </div>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
-                {/* <!-- Date Selection --> */}
-                <div>
-                  <label class="block text-gray-900 font-medium mb-3">
-                    Select Date
-                  </label>
-                  <div class="grid grid-cols-7 gap-2 mb-4">
-                    <div class="text-center text-sm font-medium text-gray-600 py-2">
-                      Sun
-                    </div>
-                    <div class="text-center text-sm font-medium text-gray-600 py-2">
-                      Mon
-                    </div>
-                    <div class="text-center text-sm font-medium text-gray-600 py-2">
-                      Tue
-                    </div>
-                    <div class="text-center text-sm font-medium text-gray-600 py-2">
-                      Wed
-                    </div>
-                    <div class="text-center text-sm font-medium text-gray-600 py-2">
-                      Thu
-                    </div>
-                    <div class="text-center text-sm font-medium text-gray-600 py-2">
-                      Fri
-                    </div>
-                    <div class="text-center text-sm font-medium text-gray-600 py-2">
-                      Sat
-                    </div>
-
-                    {/* <!-- Calendar Days --> */}
-                    <div class="text-center py-2 text-gray-400">28</div>
-                    <div class="text-center py-2 text-gray-400">29</div>
-                    <div class="text-center py-2 text-gray-400">30</div>
-                    <div class="text-center py-2 text-gray-400">31</div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      1
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      2
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      3
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      4
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      5
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      6
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      7
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      8
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      9
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      10
-                    </div>
-                    <div class="text-center py-2 bg-blue-600 text-white rounded-lg cursor-pointer">
-                      11
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      12
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      13
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      14
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      15
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      16
-                    </div>
-                    <div class="text-center py-2 hover:bg-blue-50 rounded-lg cursor-pointer">
-                      17
-                    </div>
-                  </div>
-                </div>
-
-                {/* <!-- Time Selection --> */}
-                <div>
-                  <label class="block text-gray-900 font-medium mb-3">
-                    Select Time
-                  </label>
-                  <div class="grid grid-cols-4 gap-3">
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">9:00 AM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">9:30 AM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">10:00 AM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 bg-gray-100 text-gray-400 cursor-not-allowed text-center">
-                      <div class="font-medium">10:30 AM</div>
-                      <div class="text-xs text-gray-600">Booked</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">11:00 AM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">11:30 AM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 bg-gray-100 text-gray-400 cursor-not-allowed text-center">
-                      <div class="font-medium">2:00 PM</div>
-                      <div class="text-xs text-gray-600">Booked</div>
-                    </button>
-                    <button class="border border-blue-600 bg-blue-50 rounded-lg py-3 px-4 text-center">
-                      <div class="font-medium text-blue-600">2:30 PM</div>
-                      <div class="text-xs text-blue-600">Selected</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">3:00 PM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">3:30 PM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">4:00 PM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                    <button class="border border-gray-200 rounded-lg py-3 px-4 hover:border-blue-600 hover:bg-blue-50 transition-colors text-center">
-                      <div class="font-medium">4:30 PM</div>
-                      <div class="text-xs text-gray-600">Available</div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* <!-- Reason for Visit --> */}
-                <div>
-                  <label class="block text-gray-900 font-medium mb-3">
-                    Reason for Visit
-                  </label>
-                  <textarea
-                    rows="4"
-                    placeholder="Please describe your symptoms or reason for consultation..."
-                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  ></textarea>
-                </div>
-
-                {/* <!-- Action Buttons --> */}
-                <div class="flex justify-between pt-6">
-                  <button class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
-                    <i class="fas fa-arrow-left mr-2"></i>Back
-                  </button>
-                  <button
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200"
-                    onclick="proceedToStep2()"
-                  >
-                    Continue to Patient Details
-                    <i class="fas fa-arrow-right ml-2"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* <!-- Important Information --> */}
-            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mt-6">
-              <div class="flex items-start">
-                <i class="fas fa-info-circle text-yellow-600 text-xl mr-3 mt-1"></i>
-                <div>
-                  <h3 class="font-semibold text-gray-900 mb-2">
-                    Important Information
-                  </h3>
-                  <ul class="text-sm text-gray-700 space-y-1">
-                    <li>
-                      • Please arrive 10 minutes before your scheduled
-                      appointment
-                    </li>
-                    <li>• Bring your ID and insurance card if applicable</li>
-                    <li>
-                      • Video consultation link will be sent 30 minutes before
-                      appointment
-                    </li>
-                    <li>
-                      • Cancellation must be done at least 2 hours before
-                      appointment
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab("aiAssistant")}
+                className={`flex items-center gap-2 px-6 py-4 border-b-2 font-semibold transition-colors ${
+                  activeTab === "aiAssistant"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <Bot className="w-5 h-5" />
+                AI Assistant
+              </button>
+            </nav>
           </div>
         </div>
-      </main>
+
+        {/* Book Appointment Tab */}
+        {activeTab === "book" && (
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Booking Form */}
+            <div className="lg:col-span-2">
+              {!bookingSuccess ? (
+                <div className="bg-white rounded-xl shadow-md p-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                    Patient Information
+                  </h2>
+
+                  <form onSubmit={handleSubmit}>
+                    {/* Personal Information */}
+                    <div className="space-y-6 mb-8">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Full Name *
+                          </label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="text"
+                              name="patientName"
+                              value={formData.patientName}
+                              onChange={handleInputChange}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.patientName
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                              placeholder="John Doe"
+                            />
+                          </div>
+                          {formErrors.patientName && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.patientName}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address *
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="email"
+                              name="email"
+                              value={formData.email}
+                              onChange={handleInputChange}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.email
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                              placeholder="john@example.com"
+                            />
+                          </div>
+                          {formErrors.email && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.email}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number *
+                          </label>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="tel"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleInputChange}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.phone
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                              placeholder="+1 234 567 8900"
+                            />
+                          </div>
+                          {formErrors.phone && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.phone}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Age *
+                            </label>
+                            <input
+                              type="number"
+                              name="age"
+                              value={formData.age}
+                              onChange={handleInputChange}
+                              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.age
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                              placeholder="30"
+                              min="1"
+                              max="120"
+                            />
+                            {formErrors.age && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {formErrors.age}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Gender *
+                            </label>
+                            <select
+                              name="gender"
+                              value={formData.gender}
+                              onChange={handleInputChange}
+                              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.gender
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                            >
+                              <option value="">Select</option>
+                              <option value="male">Male</option>
+                              <option value="female">Female</option>
+                              <option value="other">Other</option>
+                            </select>
+                            {formErrors.gender && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {formErrors.gender}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Address
+                        </label>
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                          <textarea
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="123 Main St, City, State"
+                            rows="2"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Appointment Details */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">
+                      Appointment Details
+                    </h3>
+                    <div className="space-y-6 mb-8">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Doctor *
+                          </label>
+                          <select
+                            name="selectedDoctor"
+                            value={formData.selectedDoctor}
+                            onChange={handleDoctorChange}
+                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              formErrors.selectedDoctor
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            }`}
+                          >
+                            <option value="">Choose a doctor</option>
+                            {doctors.map((doctor, idx) => (
+                              <option key={idx} value={doctor.name}>
+                                {doctor.name} - {doctor.specialty}
+                              </option>
+                            ))}
+                          </select>
+                          {formErrors.selectedDoctor && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.selectedDoctor}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Specialty
+                          </label>
+                          <input
+                            type="text"
+                            name="specialty"
+                            value={formData.specialty}
+                            readOnly
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                            placeholder="Auto-filled"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Appointment Date *
+                          </label>
+                          <div className="relative">
+                            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="date"
+                              name="appointmentDate"
+                              value={formData.appointmentDate}
+                              onChange={handleInputChange}
+                              min={today}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.appointmentDate
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                            />
+                          </div>
+                          {formErrors.appointmentDate && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.appointmentDate}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Appointment Time *
+                          </label>
+                          <div className="relative">
+                            <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <select
+                              name="appointmentTime"
+                              value={formData.appointmentTime}
+                              onChange={handleInputChange}
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                formErrors.appointmentTime
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              }`}
+                            >
+                              <option value="">Select time</option>
+                              {timeSlots.map((time, idx) => (
+                                <option key={idx} value={time}>
+                                  {time}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {formErrors.appointmentTime && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {formErrors.appointmentTime}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Appointment Type *
+                        </label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                appointmentType: "in-person",
+                              }))
+                            }
+                            className={`p-4 border-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
+                              formData.appointmentType === "in-person"
+                                ? "border-blue-600 bg-blue-50 text-blue-600"
+                                : "border-gray-300 hover:border-blue-300"
+                            }`}
+                          >
+                            <Building className="w-5 h-5" />
+                            <span className="font-semibold">In-Person</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                appointmentType: "video",
+                              }))
+                            }
+                            className={`p-4 border-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
+                              formData.appointmentType === "video"
+                                ? "border-blue-600 bg-blue-50 text-blue-600"
+                                : "border-gray-300 hover:border-blue-300"
+                            }`}
+                          >
+                            <Video className="w-5 h-5" />
+                            <span className="font-semibold">Video Call</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Reason for Visit *
+                        </label>
+                        <div className="relative">
+                          <FileText className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                          <textarea
+                            name="reason"
+                            value={formData.reason}
+                            onChange={handleInputChange}
+                            className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              formErrors.reason
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            }`}
+                            placeholder="Please describe your reason for booking..."
+                            rows="3"
+                          />
+                        </div>
+                        {formErrors.reason && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {formErrors.reason}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Current Symptoms (Optional)
+                        </label>
+                        <textarea
+                          name="symptoms"
+                          value={formData.symptoms}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="List any current symptoms..."
+                          rows="2"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Insurance Provider (Optional)
+                        </label>
+                        <div className="relative">
+                          <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <input
+                            type="text"
+                            name="insurance"
+                            value={formData.insurance}
+                            onChange={handleInputChange}
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Insurance company name"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="flex gap-4">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-semibold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Booking...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-5 h-5" />
+                            Book Appointment
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetForm}
+                        className="px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-colors"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                // Success Message
+                <div className="bg-white rounded-xl shadow-md p-8">
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                      <CheckCircle className="w-10 h-10 text-green-600" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                      Appointment Confirmed!
+                    </h2>
+                    <p className="text-gray-600 mb-8">
+                      Your appointment has been successfully booked
+                    </p>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                      <div className="grid md:grid-cols-2 gap-4 text-left">
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">
+                            Appointment ID
+                          </p>
+                          <p className="font-bold text-gray-900">
+                            {bookedAppointmentDetails?.id}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">
+                            Patient Name
+                          </p>
+                          <p className="font-bold text-gray-900">
+                            {formData.patientName}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Doctor</p>
+                          <p className="font-bold text-gray-900">
+                            {formData.selectedDoctor}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">
+                            Specialty
+                          </p>
+                          <p className="font-bold text-gray-900">
+                            {formData.specialty}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">
+                            Date & Time
+                          </p>
+                          <p className="font-bold text-gray-900">
+                            {formData.appointmentDate} at{" "}
+                            {formData.appointmentTime}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Type</p>
+                          <p className="font-bold text-gray-900">
+                            {formData.appointmentType === "video"
+                              ? "Video Consultation"
+                              : "In-Person Visit"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <button
+                        onClick={() => setActiveTab("myAppointments")}
+                        className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                      >
+                        <Activity className="w-5 h-5" />
+                        View My Appointments
+                      </button>
+                      <button
+                        onClick={resetForm}
+                        className="inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+                      >
+                        <Calendar className="w-5 h-5" />
+                        Book Another
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Info Sidebar */}
+            <div className="space-y-6">
+              {/* Quick Tips */}
+              <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-blue-600" />
+                  Before Your Appointment
+                </h3>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                    <span>Arrive 15 minutes early</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                    <span>Bring insurance card and ID</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                    <span>List current medications</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                    <span>Prepare questions for doctor</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Need Help */}
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h3 className="font-bold text-gray-900 mb-4">Need Help?</h3>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setActiveTab("aiAssistant")}
+                    className="w-full flex items-center gap-3 p-3 bg-linear-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-lg transition-colors"
+                  >
+                    <Bot className="w-5 h-5 text-blue-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-gray-900">
+                        AI Assistant
+                      </p>
+                      <p className="text-xs text-gray-600">Get instant help</p>
+                    </div>
+                  </button>
+                  <a
+                    href="tel:+1234567890"
+                    className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <Phone className="w-5 h-5 text-gray-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-gray-900">Call Us</p>
+                      <p className="text-xs text-gray-600">+1 234 567 890</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              {/* Selected Doctor Info */}
+              {selectedDoctor && (
+                <div className="bg-white rounded-xl shadow-md p-6">
+                  <h3 className="font-bold text-gray-900 mb-4">
+                    Selected Doctor
+                  </h3>
+                  <div className="flex items-start gap-4">
+                    <img
+                      src={selectedDoctor.image}
+                      alt={selectedDoctor.name}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-bold text-gray-900">
+                        {selectedDoctor.name}
+                      </p>
+                      <p className="text-sm text-blue-600">
+                        {selectedDoctor.specialty}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        <span className="text-sm font-semibold">
+                          {selectedDoctor.rating}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* My Appointments Tab */}
+        {activeTab === "myAppointments" && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                My Appointments
+              </h2>
+
+              {myAppointments.length === 0 ? (
+                <div className="text-center py-12">
+                  <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    No Appointments
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    You haven't booked any appointments yet
+                  </p>
+                  <button
+                    onClick={() => setActiveTab("book")}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                  >
+                    Book Your First Appointment
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {myAppointments.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow"
+                    >
+                      <div className="flex flex-col md:flex-row gap-6">
+                        <img
+                          src={appointment.image}
+                          alt={appointment.doctorName}
+                          className="w-24 h-24 rounded-lg object-cover"
+                        />
+
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-4">
+                            <div>
+                              <p className="text-sm text-gray-500 mb-1">
+                                Appointment ID: {appointment.id}
+                              </p>
+                              <h3 className="text-xl font-bold text-gray-900 mb-1">
+                                {appointment.doctorName}
+                              </h3>
+                              <p className="text-blue-600 font-medium">
+                                {appointment.specialty}
+                              </p>
+                            </div>
+                            <span
+                              className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                                appointment.status === "Upcoming"
+                                  ? "bg-green-100 text-green-700"
+                                  : appointment.status === "Completed"
+                                    ? "bg-gray-100 text-gray-700"
+                                    : "bg-yellow-100 text-yellow-700"
+                              }`}
+                            >
+                              {appointment.status}
+                            </span>
+                          </div>
+
+                          <div className="grid md:grid-cols-3 gap-4 mb-4">
+                            <div className="flex items-center gap-2 text-gray-700">
+                              <Calendar className="w-5 h-5 text-gray-400" />
+                              <div>
+                                <p className="text-xs text-gray-500">Date</p>
+                                <p className="font-medium">
+                                  {appointment.date}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-700">
+                              <Clock className="w-5 h-5 text-gray-400" />
+                              <div>
+                                <p className="text-xs text-gray-500">Time</p>
+                                <p className="font-medium">
+                                  {appointment.time}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-700">
+                              <MapPin className="w-5 h-5 text-gray-400" />
+                              <div>
+                                <p className="text-xs text-gray-500">
+                                  Location
+                                </p>
+                                <p className="font-medium">
+                                  {appointment.location}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {appointment.status === "Upcoming" && (
+                            <div className="flex flex-wrap gap-3">
+                              {appointment.type === "Video Consultation" && (
+                                <button className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                                  <Video className="w-4 h-4" />
+                                  Join Video Call
+                                </button>
+                              )}
+                              <button className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                                <Calendar className="w-4 h-4" />
+                                Reschedule
+                              </button>
+                              <button className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold transition-colors">
+                                <Download className="w-4 h-4" />
+                                Download
+                              </button>
+                              <button className="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-semibold transition-colors">
+                                <X className="w-4 h-4" />
+                                Cancel
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* AI Assistant Tab */}
+        {activeTab === "aiAssistant" && (
+          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="bg-linear-to-r from-blue-600 to-indigo-600 p-6">
+              <div className="flex items-center gap-3 text-white">
+                <Bot className="w-8 h-8" />
+                <div>
+                  <h2 className="text-2xl font-bold">AI Booking Assistant</h2>
+                  <p className="text-blue-100">
+                    Get instant help with appointment booking
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col h-150">
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+                {messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                        msg.role === "user"
+                          ? "bg-blue-600 text-white rounded-br-none"
+                          : "bg-white text-gray-800 shadow-md rounded-bl-none"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        {msg.role === "assistant" && (
+                          <Bot className="w-5 h-5 mt-1 shrink-0 text-blue-600" />
+                        )}
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {isChatLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-white rounded-2xl px-4 py-3 shadow-md">
+                      <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="p-6 bg-white border-t">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyPress={handleChatKeyPress}
+                    placeholder="Type your message..."
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={isChatLoading}
+                  />
+                  <button
+                    onClick={handleChatSend}
+                    disabled={isChatLoading || !chatInput.trim()}
+                    className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  AI assistant can help you book appointments, find doctors, and
+                  answer questions
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-export default Appointments
+export default Appointments;
