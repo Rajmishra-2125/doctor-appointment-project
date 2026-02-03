@@ -65,7 +65,7 @@ console.log(doctorInfo, "doctorInfo");
           "Doctor profile created successfully"
         )
       );
-})
+});
 
 const updateDoctorProfile = asyncHandler( async(req, res) => {
 
@@ -126,7 +126,7 @@ const existingDoctor = await Doctor.findOne({ doctor: req.user?._id });
         {data: updateDoctorInfo},
         "account details updated successfully"
     ))
-})
+});
     
 const getDoctorProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
@@ -351,7 +351,7 @@ const { specialization } = req.params
     "Success" 
   ))
 
-});
+})
 
 const getDoctorsByMostFollowers = asyncHandler(async(req, res) => {
 const { specialization } = req.params

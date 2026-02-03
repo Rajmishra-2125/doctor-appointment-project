@@ -19,7 +19,7 @@ const generateAccessAndRefreshToken = async (userId) => {
   } catch (error) {
     return new ApiError(500, "Something went wrong while generating access and refresh token")
   }
-}
+};
 
 const registerUser = asyncHandler(async (req, res) => {
    const { fullname, email, username, password, role} = req.body
@@ -86,7 +86,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     throw new ApiError(400, "Something went wrong while registering a user and Image were deleted")
    }
-}) 
+});
 
 const loginUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body
@@ -133,7 +133,7 @@ return res
  "User loggedIn successfully"
 ))
 
-})
+});
 
 const logoutUser = asyncHandler(async (req, res) => {
     User.findByIdAndUpdate(

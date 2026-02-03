@@ -49,7 +49,7 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, { data: slots }, "Slot is available"));
-});
+})
 
 const applyForBooking = asyncHandler(async (req, res) => {
   const patientId = req.user?._id;
@@ -114,7 +114,7 @@ const applyForBooking = asyncHandler(async (req, res) => {
         "Appointment booked Successfully."
       )
     );
-});
+})
 
 const cancelBooking = asyncHandler(async(req, res) => {
   const patientId = req.user?._id;

@@ -57,7 +57,7 @@ const createingNewSlots = asyncHandler(async(req, res) => {
     .status(201)
     .json(new ApiResponse(200, {data: slots}, "Slots created successfully"))
 
-}); 
+})
 
 const deleteSlot = asyncHandler(async(req, res) => {
   const doctorId = req.user?._id;
@@ -106,7 +106,7 @@ const deleteSlot = asyncHandler(async(req, res) => {
     "Slot deleted"
   ))
 
-});
+})
 
 
 
