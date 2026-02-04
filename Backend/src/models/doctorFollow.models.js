@@ -2,13 +2,13 @@ import mongoose, { Schema} from "mongoose"
 
 const doctorFollowSchema = new Schema(
   {
-    doctor: {
+    doctorId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true,
     },
-    patient: {
+    patientId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

@@ -2,13 +2,13 @@ import mongoose, { Schema } from "mongoose";
 
 const doctorSchema = new Schema(
   {
-    doctor: {
+    doctorId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       unique: true,
     },
-    username: {
+    doctor: {
       type: String,
       unique: true,
       sparse: true,
@@ -17,9 +17,14 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
     },
-    followersCount: {
-      type: Number,
-      default: 0,
+    qualification: {
+      type: [String],
+      default: [],
+      required: true,
+    },
+    bio: {
+      type: String,
+      maxlength: 500,
     },
     experience: {
       type: String,
@@ -39,10 +44,39 @@ const doctorSchema = new Schema(
         end: String, // 09:35 PM
       },
     ],
+    followersCount: {
+      type: Number,
+      default: 0,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+    },
+    numberOfReviews: {
+      type: Number,
+      default: 0,
+    },
+    isVisible: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
+    isAcceptingNewPatients: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
   },
   {
     timestamps: true,
   }
 ); 
+
+doctorSchema.pre(/^find/, function (next) {
+  if (!this.getOptions().includeInactive) {
+    this.find({ isVisible: true });
+  }
+  // next();
+});
 
 export const Doctor = mongoose.model("Doctor", doctorSchema);

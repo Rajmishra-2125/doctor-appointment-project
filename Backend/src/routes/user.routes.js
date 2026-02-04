@@ -1,42 +1,34 @@
 import { Router } from "express";
-import { 
-    registerUser, 
-    loginUser, 
-    logoutUser, 
-    refreshAccessToken, 
-    changeCurrentPassword, 
-    getCurrentUser, 
-    updateAccountDetails,
-    updateUserAvatar,
-} from '../controllers/user.controllers.js';
+import {
+         getCurrentUser,
+         updateAccountDetails,
+         updateUserAvatar,
+         changeCurrentPassword,
+         deleteAccount 
+        } from "../controllers/user.controllers.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 
 
 const router = Router();
 
-// Register new user
-router.route("/register").post(
-    upload.fields([
-        {
-            name: "avatar",
-            maxcount: 1,
-        },
-    ]),
-registerUser
-);
+// secured routes
 
-router.route('/login').post(loginUser)
-router.route("/refresh-token").get(refreshAccessToken);
+// Get current user details
+router.route("/current-user").get(verifyJWT, getCurrentUser);
 
-// secure routes
-
-router.route('/logout').post(verifyJWT, logoutUser)
-router.route("/change-password").post(verifyJWT, changeCurrentPassword);
-router.route('/current-user').get(verifyJWT, getCurrentUser)
+// Update account details
 router.route('/update-account').patch(verifyJWT, updateAccountDetails)
+
+// Update user avatar
 router
   .route("/update-avatar")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
+
+// Change current password
+router.route("/change-password").patch(verifyJWT, changeCurrentPassword);
+
+// Delete user account
+router.route("/delete-account").delete(verifyJWT, deleteAccount);
 
 export default router;

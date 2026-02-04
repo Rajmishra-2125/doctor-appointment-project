@@ -6,6 +6,44 @@ import { Doctor } from "../models/doctor.models.js";
 import { Appointment } from "../models/appointment.models.js"
 import mongoose, { set } from "mongoose";
 
+// Get my appointments
+const myAppointments = asyncHandler(async (req, res) => {
+  const patientId = req.user?._id;
+
+  const appointments = await Appointment.find({ patientId: patientId })
+    .populate("doctorId", "doctor specialization qualification experience consultationFee availableDays timeSlots")
+    .populate("slot", "slotNumber date timeSlots status")
+    .sort({ date: -1 });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { data: appointments }, "My Appointments fetched")
+    );
+});
+
+// Get appointment details by ID
+const getAppointmentById = asyncHandler(async (req, res) => {
+  const appointmentId = req.params.appointmentId;
+
+  if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+    throw new ApiError(400, "Invalid appointment ID");
+  }
+
+  const appointment = await Appointment.findById(appointmentId)
+    .populate("doctorId", "doctor specialization qualification experience consultationFee availableDays timeSlots")
+    .populate("slot", "slotNumber date timeSlots status");
+
+  if (!appointment) {
+    throw new ApiError(404, "Appointment not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { data: appointment }, "Appointment details fetched"));
+});
+
+// Get available slots for a doctor on a specific date
 const getAvailableSlots = asyncHandler(async (req, res) => {
   const { username, date } = req.body;
 
@@ -51,6 +89,7 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { data: slots }, "Slot is available"));
 })
 
+// Applying for booking an appointment
 const applyForBooking = asyncHandler(async (req, res) => {
   const patientId = req.user?._id;
   const { slotNumber, date, username } = req.body;
@@ -116,6 +155,7 @@ const applyForBooking = asyncHandler(async (req, res) => {
     );
 })
 
+// Cancel booking an appointment
 const cancelBooking = asyncHandler(async(req, res) => {
   const patientId = req.user?._id;
   const { slotNumber, username, date } = req.body
@@ -189,4 +229,51 @@ const cancelBooking = asyncHandler(async(req, res) => {
   
 });
 
-export { getAvailableSlots, applyForBooking, cancelBooking };
+// Get appointment status by doctor ID
+const getAppointmentStatusById = asyncHandler(async (req, res) => {
+  const appointmentId = req.params.appointmentId;
+
+  if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+    throw new ApiError(400, "Invalid appointment ID");
+  }
+
+  const appointment = await Appointment.findById(appointmentId);
+
+  if (!appointment) {
+    throw new ApiError(404, "Appointment not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { status: appointment.status }, "Appointment status fetched"));
+});
+
+// Get appoinntments by patient ID
+const getAppointmentsByPatientId = asyncHandler(async (req, res) => {
+  const patientId = req.params.patientId;
+
+  if (!mongoose.Types.ObjectId.isValid(patientId)) {
+    throw new ApiError(400, "Invalid patient ID");
+  }
+
+  const appointments = await Appointment.find({ patientId: patientId })
+    .populate("doctorId", "doctor specialization qualification experience consultationFee availableDays timeSlots")
+    .populate("slot", "slotNumber date timeSlots status")
+    .sort({ date: -1 });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { data: appointments }, "Appointments by patient ID fetched")
+    );
+});
+
+export { 
+  myAppointments,
+  getAppointmentById,
+  getAvailableSlots, 
+  applyForBooking, 
+  cancelBooking,
+  getAppointmentStatusById,
+  getAppointmentsByPatientId 
+};

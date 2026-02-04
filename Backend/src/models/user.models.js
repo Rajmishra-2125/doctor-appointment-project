@@ -4,6 +4,11 @@ import jwt from 'jsonwebtoken';
 
 const userSchema = new Schema(
   {
+    fullname: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     username: {
       type: String,
       required: true,
@@ -19,10 +24,6 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
     },
-    avatar: {
-      type: String, // cloudinary URL
-      required: true,
-    },
     password: {
       type: String,
       required: [true, "password is required"],
@@ -34,12 +35,57 @@ const userSchema = new Schema(
       enum: ["PATIENT", "DOCTOR", "ADMIN"],
       default: "PATIENT",
     },
+    avatar: {
+      type: String, // cloudinary URL
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+      unquie: true,
+    },
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
+    },
+    accountStatus: {
+      type: String,
+      enum: ["ACTIVE", "PENDING_DELETION","SUSPENDED", "BANNED", "DELETED"],
+      default: "ACTIVE",
+      index: true,
+    },
+    deletionScheduledAt: {
+      type: Date,
+      default: null,
+    },
+    deletionExecutionDate: {
+      type: Date,
+      default: null,
+    },
+    deletionReason: {
+      type: String,
+      default: null,
     },
     refreshToken: {
       type: String,
+      select: false,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   {
@@ -82,5 +128,11 @@ userSchema.methods.generateRefreshToken = function () {
     )
 }
 
+userSchema.pre(/^find/, function (next) {
+  if (!this.getOptions().includeInactive) {
+    this.find({ isActive: true });
+  }
+  // next();  
+});
 
 export const User = mongoose.model("User", userSchema);

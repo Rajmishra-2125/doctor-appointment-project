@@ -24,18 +24,18 @@ app.use(cookieParser())
 
 // import Routes
 import healthcheckRouter from "./routes/healthcheck.routes.js";
+import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import doctorRouter from "./routes/doctor.routes.js"
-import slotsRouter from "./routes/slots.routes.js"
 import appointmentRouter from "./routes/appointment.routes.js";
 
 
 // routes
 app.use('/api/v1/healthcheck', healthcheckRouter);
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/users/doctors", doctorRouter);
-app.use("/api/v1/users/doctors", slotsRouter);
-app.use("/api/v1/users/doctors/appointment", appointmentRouter);
+app.use("/api/v1/doctors", doctorRouter);
+app.use("/api/v1/appointment", appointmentRouter);
 
 
 export { app };

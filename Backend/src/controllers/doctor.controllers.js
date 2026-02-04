@@ -9,6 +9,7 @@ const saveDoctorInfo = asyncHandler( async(req, res) => {
 
   const {
     specialization,
+    qualification,
     experience,
     consultationFee,
     availableDays,
@@ -18,7 +19,7 @@ const saveDoctorInfo = asyncHandler( async(req, res) => {
 const existedUser = await User.findOne({
   _id: req.user?._id,
   role: "DOCTOR",
-}).select("-password")
+})
 
 console.log("existedUser", existedUser);
 console.log("existedUser?._id", existedUser?._id);
@@ -28,19 +29,20 @@ if (existedUser.role !== "DOCTOR") {
   throw new ApiError(403, "Only doctors can create profile");
 }
 
-const existingDoctor = await Doctor.findOne({doctor: req.user?._id})
+const existingDoctor = await Doctor.findOne({doctorId: req.user?._id})
 
 if (existingDoctor) {
-  throw new ApiError(401, "doctor already exists")
+  throw new ApiError(401, "doctor account already updated for any changes use update profile");
 }
 console.log("existingDoctor", existingDoctor);
 
 const doctorInfo = await Doctor.findOneAndUpdate(
-  {doctor: existedUser?._id},
+  { doctorId: req.user?._id },
   {
-    doctor: existedUser?._id,
-    username: existedUser?.username,
+    doctorId: req.user?._id,
+    doctor: req.user?.username,
     specialization,
+    qualification,
     experience,
     consultationFee,
     availableDays,
@@ -67,17 +69,46 @@ console.log(doctorInfo, "doctorInfo");
       );
 });
 
+const getMyProfile = asyncHandler(async (req, res) => {
+  const doctorId = req.user?._id;
+  const doctor = await Doctor.findOne({ doctorId: doctorId });
+
+  console.log("DoctorID:", doctorId);
+  console.log("Doctor Profile:", doctor);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { data: doctor }, "Doctor profile fetched")
+    );
+});
+
+const getDoctors = asyncHandler(async (req, res) => {
+  const doctors = await Doctor.aggregate([]).limit(20);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { data: doctors },
+        "Doctors fetched successfully"
+      )
+    );
+});
+
 const updateDoctorProfile = asyncHandler( async(req, res) => {
 
     const {
       specialization,
+      qualification,
       experience,
       consultationFee,
       availableDays,
       timeSlots,
     } = req.body;
 
-    if (!specialization || !experience || !consultationFee || !availableDays || !timeSlots) {
+    if (!specialization || !qualification || !experience || !consultationFee || !availableDays || !timeSlots) {
         throw new ApiError(401, "invalid credentials")
     }
     
@@ -94,20 +125,17 @@ const updateDoctorProfile = asyncHandler( async(req, res) => {
     //     new: true,
     //   }
     // );
-
-const existingDoctor = await Doctor.findOne({ doctor: req.user?._id });
-
-    console.log("doctor", existingDoctor);
     
 
     const updateDoctorInfo = await Doctor.findOneAndUpdate(
-      { doctor: existingDoctor._id },
+      { doctorId: req.user?._id },
       {
-        specialization,
-        experience,
-        consultationFee,
-        availableDays,
-        timeSlots,
+        specialization: specialization,
+        qualification: qualification,
+        experience: experience,
+        consultationFee: consultationFee,
+        availableDays: availableDays,
+        timeSlots: timeSlots,
       },
       {
         upsert: true,
@@ -127,110 +155,23 @@ const existingDoctor = await Doctor.findOne({ doctor: req.user?._id });
         "account details updated successfully"
     ))
 });
-    
-const getDoctorProfile = asyncHandler(async (req, res) => {
-  const { username } = req.params;
-
-  if (!username?.trim()) {
-    throw new ApiError(400, "Username is required");
-  }
-
-  const profile = await User.findOne({username})
-  
-  if (!profile) {
-    throw new ApiError(404, "User is not found");
-  }
-  
-  if (profile.role !== "DOCTOR") {
-    throw new ApiError(404, "This user is not doctor");
-  }
-
-  const doctorProfile = await Doctor.findOne({username});
-
-  console.log("doctorProfile", doctorProfile);
-
-/*
-  const doctorProfile = await Doctor.aggregate([
-    {
-      $match: {
-        username: username?.toLowerCase(),
-        role: "DOCTOR",
-      },
-    },
-    {
-      $lookup: {
-        from: "doctorsprofiles",
-        localField: "_id",
-        foreignField: "doctor",
-        as: "doctorProfile",
-      },
-    },
-    {
-      $unwind: {
-        path: "$doctorProfile",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $lookup: {
-        from: "doctorfollows",
-        localField: "_id",
-        foreignField: "doctor",
-        as: "followers",
-      },
-    },
-    {
-      $addFields: {
-        followersCount: { $size: "$followers" },
-        isFollowing: {
-          $cond: {
-            if: { $in: [req.user?._id, "$followers.patient"] },
-            then: true,
-            else: false,
-          },
-        },
-      },
-    },
-    {
-      $project: {
-        fullname: 1,
-        username: 1,
-        avatar: 1,
-        email: 1,
-
-        specialization: "$doctorProfile.specialization",
-        experience: "$doctorProfile.experience",
-        consultationFee: "$doctorProfile.consultationFee",
-        availableDays: "$doctorProfile.availableDays",
-        timeSlots: "$doctorProfile.timeSlots",
-
-        followersCount: 1,
-        isFollowing: 1,
-      },
-    },
-  ]);
-
-*/
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, {data: doctorProfile}, "doctor profile fetched"));
-});
 
 const followDoctor = asyncHandler( async(req, res) => {
   const patientId = req.user?._id;
   const { username } = req.params;
 
 
+  console.log("Username to follow:", username);
+  
   // 1. Check Doctor/User exists
-  const doctor = await Doctor.findOne({ username: username.toLowerCase() })
+  const doctor = await Doctor.findOne({ doctor: username.toLowerCase() })
+  console.log("Doctor to follow:", doctor);
   if (!doctor) {
     throw new ApiError(400, "Doctor doesn't exists.");
   }
 
-  const doctorId = doctor.doctor._id // defines doctor Id
-  
-
+  // 2. Get doctorId
+  const doctorId = doctor.doctorId;
 
   // 3. Preventing by self-follow
   if (doctorId.toString() === patientId.toString()) {
@@ -254,15 +195,15 @@ const followDoctor = asyncHandler( async(req, res) => {
   // 4. Following the doctor
   const following = await DoctorFollow.create(
     {
-      doctor: doctorId,
-      patient: patientId,
+      doctorId: doctorId,
+      patientId: patientId,
     }
   );
   console.log("Started following", following);
   
   // 5. Incrementing the followersCount
   const updateFollower = await Doctor.findOneAndUpdate(
-    {username: username},
+    {doctor: username.toLowerCase()},
     { $inc: { followersCount: 1 } },
     { new: true }
   );
@@ -284,16 +225,16 @@ const unfollowDoctor = asyncHandler(async (req, res) => {
     const {username} = req.params
     const patientId = req.user?._id
 
-  const doctor = await Doctor.findOne({ username: username.toLowerCase() })
+  const doctor = await Doctor.findOne({ doctor: username.toLowerCase() })
 
   if (!doctor) {
     throw new ApiError(404, "doctor doesn't exists.")
   }
-  const doctorId = doctor.doctor._id;
+  const doctorId = doctor.doctorId;
   console.log("doctorId", doctorId);
   
 
-  const follow = await DoctorFollow.findOne({doctor: doctorId, patient: patientId})
+  const follow = await DoctorFollow.findOne({doctorId: doctorId, patientId: patientId})
   console.log("Following", follow);
   
   if (!follow) {
@@ -305,7 +246,7 @@ const unfollowDoctor = asyncHandler(async (req, res) => {
   
 
   const result = await Doctor.findOneAndUpdate(
-    { username: username },
+    { doctor: username },
     {
       $inc: { followersCount: -1 },
     },
@@ -325,9 +266,6 @@ const unfollowDoctor = asyncHandler(async (req, res) => {
         "Doctor unfollowed successfully"
       )
     );
-    
-    
-  
 });
 
 const getDoctorsBySpecialization =asyncHandler(async(req, res) => { 
@@ -351,7 +289,7 @@ const { specialization } = req.params
     "Success" 
   ))
 
-})
+});
 
 const getDoctorsByMostFollowers = asyncHandler(async(req, res) => {
 const { specialization } = req.params
@@ -394,14 +332,77 @@ return res
 
 });
 
+const getAvailabilityById = asyncHandler(async(req, res) => {
+  const { username } = req.params;
+
+  console.log("Username received:", username);
+
+  if (!username || !username.trim()) {
+    throw new ApiError(400, "Username is required");
+  }
+
+  const doctor = await Doctor.findOne({ doctor: username.toLowerCase() });
+
+  if (!doctor) {
+    throw new ApiError(404, "Doctor doesn't exists.");
+  }
+
+  const doctorId = doctor.doctorId;
+
+  const availability = await Doctor.findOne({ 
+    doctorId: doctorId,
+    isAcceptingNewPatients: true,
+  });
+
+  if (!availability) {
+    throw new ApiError(404, "No availability found for this doctor");
+  }
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      { data: availability },
+      "Doctor availability fetched successfully"
+    )
+  );
+});
+
+
+const getAvailability = asyncHandler(async(req, res) => {
+  const doctorsAvailability = await Doctor.aggregate([
+    {
+      $match: {
+        isAcceptingNewPatients: true,
+      },
+    }
+  ]).limit(20);
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      { data: doctorsAvailability },
+      "Doctors availability fetched successfully"
+    )
+  );
+  
+
+
+})
 
 
 export {
+  getDoctors,
+  getMyProfile,
   saveDoctorInfo,
   updateDoctorProfile,
-  getDoctorProfile,
   followDoctor,
   unfollowDoctor,
   getDoctorsBySpecialization,
   getDoctorsByMostFollowers,
+  getAvailabilityById,
+  getAvailability,
 };
