@@ -181,4 +181,13 @@ userSchema.pre(/^find/, function (next) {
   // next();  
 });
 
+// Virtual for full Address
+userSchema.virtual("fullAddress").get(function () {
+  if (!this.address) return null;
+
+  const { street, city, state, zipCode, country } = this.address;
+  return `${street ? street + ", " : ""}${city ? city + ", " : ""}${state ? state + ", " : ""}${zipCode ? zipCode + ", " : ""}${country || ""}`;
+});
+
+
 export const User = mongoose.model("User", userSchema);
