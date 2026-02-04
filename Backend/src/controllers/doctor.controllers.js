@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { User } from "../models/user.models.js"
 import { Doctor } from "../models/doctor.models.js"
-import { DoctorFollow } from "../models/doctorFollow.models.js";
+import { DoctorFollow } from "../models/follow.models.js";
 
 const saveDoctorInfo = asyncHandler( async(req, res) => {
 
