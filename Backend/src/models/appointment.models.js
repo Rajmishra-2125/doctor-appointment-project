@@ -10,51 +10,42 @@ const appointmentSchema = new Schema(
     },
     doctorId: {
       type: Schema.Types.ObjectId,
-      ref: "Doctor",
+      ref: "User",
       required: true,
       index: true,
     },
     date: {
       type: Date,
-      required: true,
+      required: [true, "Appointment date is required"],
       index: true,
     },
-    timeSlots: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
-    symptoms: {
+    timeSlots: {
       type: String,
-      required: false,
-    },
-    prescription: {
-      type: String,
-      required: false,
-    },
-    slot: {
-      type: Schema.Types.ObjectId,
-      ref: "Slot",
-      required: true,
-    },
-    slotNumber: {
-      type: String,
-      required: true,
+      required: [true, "Time slot is required"],
     },
     status: {
       type: String,
-      enum: ["CONFIRMED", "COMPLETED", "CANCELLED", "PENDING", "RESCHEDULED"],
-      default: "CONFIRMED",
-      required: true,
+      enum: ["CONFIRMED", "COMPLETED", "CANCELLED", "PENDING", "RESCHEDULED", "NO_SHOW"],
+      default: "PENDING",
       index: true,
     },
+    reason: {
+      type: String,
+      required: [true, "Reason for appointment is required"],
+      maxlength: [500, "Reason cannot exceed 500 characters"],
+    },
+    symptoms: {
+      type: [String],
+      default: [],
+    },
+
+    // Cancellation Information
     cancellationReason: {
       type: String,
       default: null,
     },
-    rescheduleReason: {
-      type: String,
+    cancelledAt: {
+      type: Date,
       default: null,
     },
     cancelledBy: {
@@ -62,6 +53,74 @@ const appointmentSchema = new Schema(
       ref: "User",
       default: null,
     },
+
+    // Rescheduling Information
+    rescheduleFrom: {
+      date: Date,
+      timeSlots: String,
+    },
+    rescheduleAt: {
+      type: Date,
+      default: null,
+    },
+    rescheduleReason: {
+      type: String,
+      default: null,
+    },
+
+    // Payment Information
+    consulationFee: {
+      type: Number,
+      required: [true, "Consultation fee is required"],
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+      default: "PENDING",
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["CREDIT_CARD", "DEBIT_CARD", "UPI", "WALLET", "CASH"],
+    },
+    paidAt: {
+      type: Date,
+    },
+
+    // Prescription Information & Notes
+    prescription: {
+      medications: [{
+        name: String,
+        dosage: String,
+        frequency: String,
+        duration: String,
+        instructions: String,
+      }],
+      tests: [{
+        name: String,
+        instructions: String,
+      }],
+      advice: String,
+      followUpDate: Date,
+    },
+    doctorNotes: {
+      type: String,
+      maxlength: [1000, "Doctor notes cannot exceed 1000 characters"],
+    },
+
+    // Meeting Information(for online appointments)
+    meetingLink: {
+      type: String,
+    },
+    meetingType: {
+      type: String,
+      enum: ["IN_PERSON", "ONLINE", "PHONE"],
+      default: "IN_PERSON",
+    },
+    meetingPassword: {
+      type: String,
+    },
+
+    // creation timestamp
     createdAt: {
       type: Date,
       default: Date.now,
@@ -71,5 +130,24 @@ const appointmentSchema = new Schema(
     timestamps: true,
   }
 );
+
+// Compound indexes for efficient queries
+appointmentSchema.index({ doctorId: 1, date: 1 });
+appointmentSchema.index({ patientId: 1, date: 1});
+appointmentSchema.index({ status: 1, date: 1 });
+appointmentSchema.index({ date: 1, timeSlots: 1 });
+
+
+// Prevent double booking for the same doctor at the same date and time slot
+appointmentSchema.index(
+  { doctorId: 1, date: 1, timeSlots: 1 },
+  { 
+    unique: true, 
+    partialFilterExpression: {
+      status: { $in: ["CONFIRMED", "PENDING"] },
+    }
+  }
+);
+
 
 export const Appointment = mongoose.model("Appointment", appointmentSchema)
