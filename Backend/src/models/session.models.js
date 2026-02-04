@@ -14,18 +14,11 @@ const sessionSchema = new Schema(
         unique: true,
     },
     deviceInfo: {
-        userAgent: {
-            type: String,
-            required: true,
-        },
-        ipAddress: {
-            type: String,
-            required: true,
-        },
-        device: {
-            type: String,
-            required: true,
-        },
+        userAgent: String,
+        ipAddress: String,
+        device: String,
+        os: String,
+        browser: String,
     },
     isActive: {
         type: Boolean,
@@ -35,6 +28,10 @@ const sessionSchema = new Schema(
         type: Date,
         required: true,
         index: true,
+    },
+    lastUsedAt: {
+        type: Date,
+        default: Date.now,
     },   
   },
   {
