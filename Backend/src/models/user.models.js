@@ -6,8 +6,10 @@ const userSchema = new Schema(
   {
     fullname: {
       type: String,
-      required: true,
+      required: [true, "Full name is required"],
       trim: true,
+      minlength: [2, "Full name must be at least 2 characters long"],
+      maxlength: [50, "Full name must be at most 50 characters long"],
     },
     username: {
       type: String,
@@ -19,39 +21,49 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
       unique: true,
       lowercase: true,
       trim: true,
+      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Please provide a valid email address"],
     },
     password: {
       type: String,
       required: [true, "password is required"],
-      minlength: 6,
+      minlength: [6, "Password must be at least 6 characters long"],
       select: false, // important for security
     },
     role: {
       type: String,
       enum: ["PATIENT", "DOCTOR", "ADMIN"],
       default: "PATIENT",
-    },
-    avatar: {
-      type: String, // cloudinary URL
       required: true,
+    },
+    profileImage: {
+      type: String, // cloudinary URL
+      default: null,
     },
     phone: {
       type: String,
       required: true,
-      unquie: true,
+      trim: true,
+      match: [/^\+?[1-9]\d{1,14}$/, "Please provide a valid phone number"],
     },
     dateOfBirth: {
       type: Date,
-      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ["MALE", "FEMALE", "OTHER"],  
     },
     address: {
-      type: String,
-      required: true,
+      street: String,
+      city: String,
+      state: String,
+      zipCode: String,
+      country: String,
     },
+   // account status and management fields
     isActive: {
       type: Boolean,
       default: true,
@@ -59,7 +71,7 @@ const userSchema = new Schema(
     },
     accountStatus: {
       type: String,
-      enum: ["ACTIVE", "PENDING_DELETION","SUSPENDED", "BANNED", "DELETED"],
+      enum: ["ACTIVE", "PENDING_DELETION", "SUSPENDED", "BANNED", "DELETED"],
       default: "ACTIVE",
       index: true,
     },
@@ -75,8 +87,31 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    // Authentication tokens
     refreshToken: {
       type: String,
+      select: false,
+    },
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      select: false,
+    },
+
+    // Email verification fields
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationToken: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpires: {
+      type: Date,
       select: false,
     },
     createdAt: {
@@ -93,15 +128,24 @@ const userSchema = new Schema(
   }
 );
 
+// Indexes for better querry performance optimization
+userSchema.index({ email: 1 });
+userSchema.index({ username: 1 });
+userSchema.index({ accountStatus: 1 });
+userSchema.index({ isActive: 1 });
+
+// Hashing password before saving
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10)
 })  
 
+// Instance method to compare password
 userSchema.methods.isPasswordCorrect = async function (password) {   
   return await bcrypt.compare(password, this.password);
 };
 
+// Generate JWT tokens
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
     {
@@ -116,6 +160,7 @@ userSchema.methods.generateAccessToken = function () {
     )
 }
 
+// Generate refresh token
 userSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
         {
@@ -128,6 +173,7 @@ userSchema.methods.generateRefreshToken = function () {
     )
 }
 
+// Automaticaly filter out inactive users on find queries
 userSchema.pre(/^find/, function (next) {
   if (!this.getOptions().includeInactive) {
     this.find({ isActive: true });
