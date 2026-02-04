@@ -33,7 +33,7 @@ function Header() {
           <div className="flex items-center lg:order-2">
             <Link
               to="/register"
-              className="text-white border-0 hover:border-blue-600 bg-orange-600 hover:bg-indigo-600 focus:ring-5 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none"
+              className="text-white border-0 hover:border-blue-600 bg-orange-600 hover:bg-indigo-600 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none transition-colors duration-200"
             >
               Login/Signup
             </Link>
@@ -41,7 +41,7 @@ function Header() {
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={toggleMobileMenu}
-              className="inline-flex items-center p-2 ml-1 text-sm text-white rounded-lg lg:hidden hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
+              className="inline-flex items-center p-2 ml-1 text-sm text-white rounded-lg lg:hidden hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 transition-colors duration-200"
               aria-controls="mobile-menu-2"
               aria-expanded={isMobileMenuOpen}
             >
@@ -64,7 +64,7 @@ function Header() {
                 <NavLink
                   to="/"
                   className={({ isActive }) =>
-                    `text-white text-sm block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 ${isActive ? "text-orange-700" : "text-gray-700"} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                    `text-sm block py-2 pr-4 pl-3 duration-200 ${isActive ? "text-orange-500" : "text-white"} hover:text-orange-500 lg:p-0 transition-colors`
                   }
                 >
                   Home
@@ -74,7 +74,7 @@ function Header() {
                 <NavLink
                   to="/doctors"
                   className={({ isActive }) =>
-                    `text-white text-sm block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 ${isActive ? "text-orange-700" : "text-gray-700"} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                    `text-sm block py-2 pr-4 pl-3 duration-200 ${isActive ? "text-orange-500" : "text-white"} hover:text-orange-500 lg:p-0 transition-colors`
                   }
                 >
                   Doctors
@@ -82,9 +82,9 @@ function Header() {
               </li>
               <li>
                 <NavLink
-                  to="doctors/appointments"
+                  to="/appointments"
                   className={({ isActive }) =>
-                    `text-white text-sm block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 ${isActive ? "text-orange-700" : "text-gray-700"} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                    `text-sm block py-2 pr-4 pl-3 duration-200 ${isActive ? "text-orange-500" : "text-white"} hover:text-orange-500 lg:p-0 transition-colors`
                   }
                 >
                   Appointments
@@ -94,7 +94,7 @@ function Header() {
                 <NavLink
                   to="/services"
                   className={({ isActive }) =>
-                    `text-white text-sm block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 ${isActive ? "text-orange-700" : "text-gray-700"} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                    `text-sm block py-2 pr-4 pl-3 duration-200 ${isActive ? "text-orange-500" : "text-white"} hover:text-orange-500 lg:p-0 transition-colors`
                   }
                 >
                   Services
@@ -104,7 +104,7 @@ function Header() {
                 <NavLink
                   to="/contact"
                   className={({ isActive }) =>
-                    `text-white text-sm block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 ${isActive ? "text-orange-700" : "text-gray-700"} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                    `text-sm block py-2 pr-4 pl-3 duration-200 ${isActive ? "text-orange-500" : "text-white"} hover:text-orange-500 lg:p-0 transition-colors`
                   }
                 >
                   Contact
@@ -114,7 +114,7 @@ function Header() {
                 <NavLink
                   to="/about"
                   className={({ isActive }) =>
-                    `text-white text-sm block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 ${isActive ? "text-orange-700" : "text-gray-700"} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                    `text-sm block py-2 pr-4 pl-3 duration-200 ${isActive ? "text-orange-500" : "text-white"} hover:text-orange-500 lg:p-0 transition-colors`
                   }
                 >
                   About Us
@@ -128,7 +128,7 @@ function Header() {
             <div className="relative">
               <input
                 type="text"
-                className="block w-full pl-10 pr-4 py-2 text-white bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-2 hover:border-indigo-500 focus:border-2 focus:border-indigo-500 sm:text-sm"
+                className="block w-full pl-10 pr-4 py-2 text-gray-900 bg-gray-50 rounded-lg border border-gray-300 hover:border-2 hover:border-indigo-500 focus:border-2 focus:border-indigo-500 focus:outline-none sm:text-sm placeholder-gray-500"
                 placeholder="Search Doctors..."
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -151,7 +151,7 @@ function Header() {
               to="/"
               onClick={closeMobileMenu}
               className={({ isActive }) =>
-                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 ${
+                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 transition-colors duration-200 ${
                   isActive ? "bg-gray-700 text-orange-500" : ""
                 }`
               }
@@ -164,7 +164,7 @@ function Header() {
               to="/doctors"
               onClick={closeMobileMenu}
               className={({ isActive }) =>
-                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 ${
+                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 transition-colors duration-200 ${
                   isActive ? "bg-gray-700 text-orange-500" : ""
                 }`
               }
@@ -174,10 +174,10 @@ function Header() {
           </li>
           <li>
             <NavLink
-              to="doctors/appointments"
+              to="/appointments"
               onClick={closeMobileMenu}
               className={({ isActive }) =>
-                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 ${
+                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 transition-colors duration-200 ${
                   isActive ? "bg-gray-700 text-orange-500" : ""
                 }`
               }
@@ -190,7 +190,7 @@ function Header() {
               to="/services"
               onClick={closeMobileMenu}
               className={({ isActive }) =>
-                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 ${
+                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 transition-colors duration-200 ${
                   isActive ? "bg-gray-700 text-orange-500" : ""
                 }`
               }
@@ -203,7 +203,7 @@ function Header() {
               to="/contact"
               onClick={closeMobileMenu}
               className={({ isActive }) =>
-                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 ${
+                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 transition-colors duration-200 ${
                   isActive ? "bg-gray-700 text-orange-500" : ""
                 }`
               }
@@ -216,7 +216,7 @@ function Header() {
               to="/about"
               onClick={closeMobileMenu}
               className={({ isActive }) =>
-                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 ${
+                `block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700 transition-colors duration-200 ${
                   isActive ? "bg-gray-700 text-orange-500" : ""
                 }`
               }
@@ -231,7 +231,7 @@ function Header() {
           <div className="relative">
             <input
               type="text"
-              className="block w-full pl-10 pr-4 py-2 text-white bg-gray-700 rounded-lg border border-gray-600 hover:border-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-gray-400"
+              className="block w-full pl-10 pr-4 py-2 text-white bg-gray-700 rounded-lg border border-gray-600 hover:border-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm placeholder-gray-400"
               placeholder="Search Doctors..."
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />

@@ -1,269 +1,232 @@
-import React from 'react'
-import { Link } from "react-router-dom";
+import React from "react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+} from "lucide-react";
 
+const Footer = () => {
 
-function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="max-w-9xl mx-7 px-2 sm:px-4 lg:px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
-          <div>
-            <div className="shrink-0">
-              <Link to="/" className="flex items-center">
-                <img
-                  src="https://media.istockphoto.com/id/184364634/photo/stethoscope.jpg?s=612x612&w=0&k=20&c=kkJWBFleK7Qo-IdB6wHR1d0QH9KQ2yRT9HplAxEuhRA="
-                  className="mr-3 h-12 rounded-xl mx-3"
-                  alt="Logo"
-                />
-                <div>
-                  <h1 class="text-xl font-medium text-white">MediCare</h1>
-                  <p class="text-xs text-center text-white">
-                    Healthcare Solutions
-                  </p>
-                </div>
-              </Link>
+    <footer className="bg-gray-900 text-gray-300">
+      {/* Main Footer Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* About Section */}
+          <div className="space-y-4">
+            <h3 className="text-white text-lg font-semibold mb-4">About Us</h3>
+            <p className="text-sm text-gray-400">
+              Your trusted healthcare partner. We connect patients with
+              qualified doctors for seamless appointment scheduling and quality
+              medical care.
+            </p>
+            <div className="flex space-x-4 pt-2">
+              <a
+                href="#"
+                className="hover:text-orange-500 transition-colors"
+                aria-label="Facebook"
+              >
+                <Facebook size={20} />
+              </a>
+              <a
+                href="#"
+                className="hover:text-orange-500 transition-colors"
+                aria-label="Twitter"
+              >
+                <Twitter size={20} />
+              </a>
+              <a
+                href="#"
+                className="hover:text-orange-500 transition-colors"
+                aria-label="Instagram"
+              >
+                <Instagram size={20} />
+              </a>
+              <a
+                href="#"
+                className="hover:text-orange-500 transition-colors"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={20} />
+              </a>
             </div>
-            <span className="mt-4 items-start gap-0 text-sm text-gray-400">
-              Your trusted partner in healthcare. Quality medical services at
-              your fingertips.
-            </span>
           </div>
 
+          {/* Quick Links */}
           <div>
-            <p className="text-sm font-semibold text-white mb-4">Quick Links</p>
-            <ul className="space-y-1 text-xs text-gray-400">
+            <h3 className="text-white text-lg font-semibold mb-4">
+              Quick Links
+            </h3>
+            <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/" className="hover:underline hover:text-gray-400">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/doctors"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Doctors
-                </Link>
+                  Find Doctors
+                </a>
               </li>
               <li>
-                <Link
-                  to="/appointments"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/specialties"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Appointments
-                </Link>
+                  Specialties
+                </a>
               </li>
               <li>
-                <Link
-                  to="/services"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/appointments"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Services
-                </Link>
+                  Book Appointment
+                </a>
               </li>
               <li>
-                <Link
-                  to="/contact"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/aboutus"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/about"
+                  className="hover:text-orange-500 transition-colors"
                 >
                   About Us
-                </Link>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/contact"
+                  className="hover:text-orange-500 transition-colors"
+                >
+                  Contact
+                </a>
               </li>
             </ul>
           </div>
 
+          {/* Services */}
           <div>
-            <p className="text-sm space-y-1 font-semibold text-white mb-4">
-              For patients
-            </p>
-            <ul className="space-y-1 text-xs text-gray-400">
+            <h3 className="text-white text-lg font-semibold mb-4">Services</h3>
+            <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/services/consultation"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Search for Doctors
-                </Link>
+                  Online Consultation
+                </a>
               </li>
               <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/services/lab-tests"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Search for Clinics
-                </Link>
+                  Lab Tests
+                </a>
               </li>
               <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/services/prescriptions"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Search for Hospitals
-                </Link>
+                  Prescription Refills
+                </a>
               </li>
               <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/services/health-records"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Check Slots
-                </Link>
+                  Health Records
+                </a>
               </li>
               <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
+                <a
+                  href="/services/emergency"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Book Appointments
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Cancel Appointments
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <p className="text-sm space-y-2 font-semibold text-white mb-4">
-              For Doctors
-            </p>
-            <ul className="space-y-1 text-xs text-gray-400">
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Create Slots
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Booked Appointments
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Cancelled Appointments
-                </Link>
+                  Emergency Care
+                </a>
               </li>
             </ul>
           </div>
 
+          {/* Contact Info */}
           <div>
-            <p className="text-sm font-semibold text-white mb-4">More</p>
-            <ul className="space-y-1 text-xs text-gray-400">
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Help
-                </Link>
+            <h3 className="text-white text-lg font-semibold mb-4">
+              Contact Us
+            </h3>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start space-x-3">
+                <MapPin size={18} className="mt-1 shrink-0" />
+                <span>
+                  123 Medical Center Dr, Suite 100, Healthcare City, HC 12345
+                </span>
               </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
+              <li className="flex items-center space-x-3">
+                <Phone size={18} className="shrink-0" />
+                <a
+                  href="tel:+1234567890"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Developers
-                </Link>
+                  +1 (234) 567-890
+                </a>
               </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
+              <li className="flex items-center space-x-3">
+                <Mail size={18} className=" shrink-0" />
+                <a
+                  href="mailto:info@doctorappointment.com"
+                  className="hover:text-orange-500 transition-colors"
                 >
-                  Private Policy
-                </Link>
+                  info@doctorappointment.com
+                </a>
               </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Terms & Conditions
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <p className="text-sm font-semibold text-white mb-4">Connect</p>
-            <ul className="space-y-1 text-xs text-gray-400">
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Facebook
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Twitter
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  Instagram
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  LinkedIn
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/doctors"
-                  className="hover:underline hover:text-gray-400"
-                >
-                  GitHub
-                </Link>
+              <li className="flex items-start space-x-3">
+                <Clock size={18} className="mt-1 shrink-0" />
+                <div>
+                  <p>Mon - Fri: 8:00 AM - 8:00 PM</p>
+                  <p>Sat - Sun: 9:00 AM - 5:00 PM</p>
+                </div>
               </li>
             </ul>
           </div>
         </div>
+      </div>
 
-        <div className="mt-4 mb-4 pt-2 pb-2 border-t items-center border-gray-800 ">
-          <span className="text-sm text-gray-500 sm:text-center">
-            copyright© 2023, {" "}
-            <a href="https://hiteshchoudhary.com/" className="hover:underline">
-              Medicare
-            </a>
-             . All Rights Reserved.
-          </span>
+      {/* Bottom Bar */}
+      <div className="border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <p className="text-sm text-gray-400">
+              © 2026 Medicare. All rights reserved.
+            </p>
+            <div className="flex space-x-6 text-sm">
+              <a
+                href="/privacy"
+                className="hover:text-orange-500 transition-colors"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="/terms"
+                className="hover:text-orange-500 transition-colors"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="/cookies"
+                className="hover:text-orange-500 transition-colors"
+              >
+                Cookie Policy
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
   );
-}
+};
 
-export default Footer
+export default Footer;

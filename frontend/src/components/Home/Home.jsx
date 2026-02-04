@@ -207,7 +207,7 @@ function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  to="/doctors/appointments"
+                  to="/appointments"
                   className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl"
                 >
                   Book Appointment
@@ -519,7 +519,7 @@ function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/doctors/appointments"
+              to="/appointments"
               className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl"
             >
               <Calendar className="w-5 h-5" />
