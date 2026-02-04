@@ -31,7 +31,7 @@ const followSchema = new Schema(
 
 // Prevent duplicate follows
 
-doctorFollowSchema.index(
+followSchema.index(
     {
         doctorId: 1,
         patientId: 1,
@@ -42,7 +42,7 @@ doctorFollowSchema.index(
 )
 
 // Only fetch non-deleted follows by default
-doctorFollowSchema.pre(/^find/, function (next) {
+followSchema.pre(/^find/, function (next) {
    if (!this.getOptions().includeDeleted) {
        this.find({ isDeleted: false });
    }
