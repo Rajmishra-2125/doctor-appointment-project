@@ -23,6 +23,7 @@ const sessionSchema = new Schema(
     isActive: {
         type: Boolean,
         default: true,
+        index: true,
     },
     expiresAt: {
         type: Date,
@@ -39,8 +40,5 @@ const sessionSchema = new Schema(
   }
 );       
 
-
-// Auto-remove expired sessions
-sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const Session = mongoose.model("Session", sessionSchema);
