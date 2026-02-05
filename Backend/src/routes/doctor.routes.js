@@ -57,7 +57,7 @@ router
 
 
 // Geting availability
-router.route("/check-availability").post(verifyJWT, getAvailability);
+router.route("/check-availability").get(verifyJWT, getAvailability);
 
 // Checking availabilty by doctor ID
 
