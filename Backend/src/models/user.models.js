@@ -26,6 +26,7 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
       match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Please provide a valid email address"],
+      index: true,
     },
     password: {
       type: String,
@@ -42,6 +43,7 @@ const userSchema = new Schema(
     profileImage: {
       type: String, // cloudinary URL
       default: null,
+      required: true
     },
     phone: {
       type: String,
@@ -127,12 +129,6 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
-
-// Indexes for better querry performance optimization
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-userSchema.index({ accountStatus: 1 });
-userSchema.index({ isActive: 1 });
 
 // Hashing password before saving
 userSchema.pre("save", async function (next) {
