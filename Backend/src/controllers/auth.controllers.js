@@ -8,6 +8,7 @@ import {
 import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/ApiError.js";
 import mongoose, { set } from "mongoose";
+import { Doctor } from "../models/doctor.models.js";
 
 // Generate Access and Refresh Token
 const generateAccessAndRefreshToken = async (userId) => {
@@ -41,73 +42,107 @@ const generateAccessAndRefreshToken = async (userId) => {
 
 // Register new user
 const registerUser = asyncHandler(async (req, res) => {
-   const { fullname, email, username, password, role, phone, DOB, address} = req.body
+  const {
+    fullname,
+    email,
+    username,
+    gender,
+    password,
+    role,
+    phone,
+    DOB,
+    street,
+    city,
+    state,
+    pinCode,
+    country,
+  } = req.body;
 
-   if ([fullname, username, email, password, phone, DOB, address].some((field) => {field?.trim() === ""})) {
-    throw new ApiError(400, "All fields are required")
-   }
+  if (
+    [
+      fullname,
+      username,
+      email,
+      gender,
+      password,
+      role,
+      phone,
+      DOB,
+      street,
+      city,
+      state,
+      pinCode,
+      country,
+    ].some((field) => !field || field?.trim() === "")
+  ) {
+    throw new ApiError(400, "All fields are required");
+  }
 
-    let userRole = "PATIENT";
+  // Allow ONLY DOCTOR from request
 
-    // Allow ONLY DOCTOR from request
-    if (role === "DOCTOR") {
-      userRole = "DOCTOR";
-    }
+  let userRole = role === "DOCTOR" ? "DOCTOR" : "PATIENT";
 
-   const existeduser = await User.findOne({
-    $or: [{ username }, { email }]
-  })
 
-   if(existeduser) {
-    throw new ApiError(404, "user with username or email already exists.")
-   }
+  const existeduser = await User.findOne({
+    $or: [{ username }, { email }],
+  }).select("_id")
 
-   console.warn(req.files);
-   const avatarLocalPath = req.files?.avatar?.[0]?.path 
-   
+  if (existeduser) {
+    throw new ApiError(404, "user with username or email already exists.");
+  }
 
-   let avatar;
-   try {
-    avatar = await uploadOnCloudinary(avatarLocalPath)
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+
+  let avatar;
+  try {
+    avatar = await uploadOnCloudinary(avatarLocalPath);
     console.log("Uploaded Avatar", avatar);
-   } catch (error) {
+  } catch (error) {
     console.log("Error uploading avatar", error);
-    return new ApiError(500, "Failed to upload avatar")
-   }
+    return new ApiError(500, "Failed to upload avatar");
+  }
 
-
-   try {
+  try {
     const user = await User.create({
       fullname: fullname,
       username: username.toLowerCase(),
-      email,
+      email: email,
+      gender: gender,
       password,
       role: userRole,
-      avatar: avatar.url,
+      profileImage: avatar.url,
       phone: phone,
       dateOfBirth: DOB,
-      address: address,
-    });
-    console.log("user is existing", user);
+      address: {
+        street: street,
+        city: city,
+        state: state,
+        zipCode: pinCode,
+        country: country,
+      },
+    })
 
-    const createdUser = await User.findById(user._id).select("-password -refreshToken")
+    const createdUser = await User.findOne({ _id: user._id }).select(
+      "-password -refreshToken"
+    );
 
-    if(!createdUser) {
-      throw new ApiError(500, "Something went wrong")
-    }
+    
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, createdUser, "User register successfully"))
-   } catch (error) {
+      .status(200)
+      .json(new ApiResponse(200, createdUser, "User register successfully"));
+  } catch (error) {
     console.log("User creation error", error);
 
     if (!avatar) {
-      await deleteFromCloudinary(avatar.public_id)
+      await deleteFromCloudinary(avatar.public_id);
     }
 
-    throw new ApiError(400, "Something went wrong while registering a user and Image were deleted")
-   }
+    throw new ApiError(
+      400,
+      "Something went wrong while registering a user and Image were deleted"
+    );
+  }
 });
 
 // Login user
@@ -115,7 +150,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body
 
   if(!(email || username)) {
-    throw new ApiError(400, "email is required")
+    throw new ApiError(400, "email or username is required")
   }
 
   if(!password) {
