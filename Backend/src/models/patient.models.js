@@ -11,6 +11,7 @@ const patientSchema = new Schema(
         },
         bloodGroup: {
             type: String,
+            index: true,
             enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
         },
         alergies: {
@@ -71,9 +72,6 @@ const patientSchema = new Schema(
     }
 )
 
-// Inboxes
-patientSchema.index({ patientId: 1 });
-patientSchema.index({ bloodGroup: 1 });
 
 const Patient = mongoose.model("Patient", patientSchema);
 
