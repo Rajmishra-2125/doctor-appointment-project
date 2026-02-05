@@ -79,10 +79,12 @@ const doctorSchema = new Schema(
     },
     clinicPhone: {
       type: String,
+      unique: true,
       trim: true,
     },
     clinicEmail: {
       type: String,
+      unique: true,
       trim: true,
     },
 
@@ -98,11 +100,19 @@ const doctorSchema = new Schema(
         "SATURDAY",
         "SUNDAY",
       ],
-      default: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+      default: [
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY",
+        "SUNDAY",
+      ],
     },
     availableTimeSlots: {
       type: [String], // ["09:00-10:00", "10:00-11:00"]
-      default: [],
+      default: ["09:00 AM to 01:00 PM", "02:00 PM to 08:00 PM"],
     },
     workingHours: {
       start: {
@@ -134,7 +144,7 @@ const doctorSchema = new Schema(
       type: Number,
       default: 30,
       min: 1,
-      max: 90,
+      max: 365,
     },
 
     // Status Information
