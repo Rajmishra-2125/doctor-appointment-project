@@ -22,9 +22,6 @@ const generateAccessAndRefreshToken = async (userId) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    // user.refreshToken = refreshToken;
-    // await user.save({ validateBeforeSave: false });
-
     await User.findByIdAndUpdate(
       user._id,
       { refreshToken },
@@ -51,11 +48,6 @@ const registerUser = asyncHandler(async (req, res) => {
     role,
     phone,
     DOB,
-    street,
-    city,
-    state,
-    pinCode,
-    country,
   } = req.body;
 
   if (
@@ -68,11 +60,6 @@ const registerUser = asyncHandler(async (req, res) => {
       role,
       phone,
       DOB,
-      street,
-      city,
-      state,
-      pinCode,
-      country,
     ].some((field) => !field || field?.trim() === "")
   ) {
     throw new ApiError(400, "All fields are required");
@@ -99,7 +86,6 @@ const registerUser = asyncHandler(async (req, res) => {
     console.log("Uploaded Avatar", avatar);
   } catch (error) {
     console.log("Error uploading avatar", error);
-    return new ApiError(500, "Failed to upload avatar");
   }
 
   try {
@@ -110,17 +96,27 @@ const registerUser = asyncHandler(async (req, res) => {
       gender: gender,
       password,
       role: userRole,
-      profileImage: avatar.url,
+      profileImage: avatar?.url || "",
       phone: phone,
       dateOfBirth: DOB,
-      address: {
-        street: street,
-        city: city,
-        state: state,
-        zipCode: pinCode,
-        country: country,
-      },
     })
+
+
+    // AUTO-ONBOARDING: Create Doctor Profile if role is DOCTOR
+    if (userRole === "DOCTOR") {
+        try {
+            console.log("Attempting to create Doctor Profile for:", user._id);
+            await Doctor.create({
+                doctorId: user._id,
+                doctor: username.toLowerCase(), 
+                // Other fields are now optional in schema and can be filled later
+            });
+            console.log("Doctor Profile Created Successfully");
+        } catch (docError) {
+            console.error("DOCTOR PROFILE CREATION FAILED:", JSON.stringify(docError, null, 2));
+            throw docError; // Re-throw to trigger main catch
+        }
+      }    
 
     const createdUser = await User.findOne({ _id: user._id }).select(
       "-password -refreshToken"
@@ -134,13 +130,13 @@ const registerUser = asyncHandler(async (req, res) => {
   } catch (error) {
     console.log("User creation error", error);
 
-    if (!avatar) {
+    if (avatar) {
       await deleteFromCloudinary(avatar.public_id);
     }
 
     throw new ApiError(
       400,
-      "Something went wrong while registering a user and Image were deleted"
+      `Registration Failed: ${error?.message || "Something went wrong"}`
     );
   }
 });
@@ -208,8 +204,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     )
   
     const user = await User.findById(decodedToken?._id)
-
-    console.log("User:", user);
     
   
     if (!user) {
@@ -226,8 +220,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
   
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
-
-    console.log("newRefreshToken", refreshToken);
     
   
     return res
