@@ -42,8 +42,7 @@ const userSchema = new Schema(
     },
     profileImage: {
       type: String, // cloudinary URL
-      default: null,
-      required: true
+      default: "",
     },
     phone: {
       type: String,
@@ -131,8 +130,8 @@ const userSchema = new Schema(
 );
 
 // Hashing password before saving
-userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password, 10)
 })  
 
@@ -174,7 +173,6 @@ userSchema.pre(/^find/, function (next) {
   if (!this.getOptions().includeInactive) {
     this.find({ isActive: true });
   }
-  // next();  
 });
 
 // Virtual for full Address
