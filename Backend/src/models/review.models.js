@@ -89,11 +89,10 @@ reviewSchema.index({ patientId: 1, doctorId: 1, appointmentId: 1 }, { unique: tr
 reviewSchema.index({ doctorId: 1, rating: -1 });
 
 // Only fetch approved and non-deleted reviews by default
-reviewSchema.pre(/^find/, function (next) {
+reviewSchema.pre(/^find/, function () {
    if (!this.getOptions().includeUnapproved) {
        this.find({ isApproved: true, isDeleted: false });
    }
-   next();
 });
 
 export const Review = mongoose.model("Review", reviewSchema);
