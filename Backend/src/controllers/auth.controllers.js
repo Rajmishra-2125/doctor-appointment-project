@@ -22,15 +22,10 @@ const generateAccessAndRefreshToken = async (userId) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    await User.findByIdAndUpdate(
-      user._id,
-      { refreshToken },
-      { new: true }
-    );
+    await User.findByIdAndUpdate(user._id, { refreshToken }, { new: true });
     return { accessToken, refreshToken };
-
   } catch (error) {
-    return new ApiError(
+    throw new ApiError(
       500,
       "Something went wrong while generating access and refresh token"
     );
@@ -39,28 +34,13 @@ const generateAccessAndRefreshToken = async (userId) => {
 
 // Register new user
 const registerUser = asyncHandler(async (req, res) => {
-  const {
-    fullname,
-    email,
-    username,
-    gender,
-    password,
-    role,
-    phone,
-    DOB,
-  } = req.body;
+  const { fullname, email, username, gender, password, role, phone, DOB } =
+    req.body;
 
   if (
-    [
-      fullname,
-      username,
-      email,
-      gender,
-      password,
-      role,
-      phone,
-      DOB,
-    ].some((field) => !field || field?.trim() === "")
+    [fullname, username, email, gender, password, role, phone, DOB].some(
+      (field) => !field || field?.trim() === ""
+    )
   ) {
     throw new ApiError(400, "All fields are required");
   }
@@ -69,10 +49,9 @@ const registerUser = asyncHandler(async (req, res) => {
 
   let userRole = role === "DOCTOR" ? "DOCTOR" : "PATIENT";
 
-
   const existeduser = await User.findOne({
     $or: [{ username }, { email }],
-  }).select("_id")
+  }).select("_id");
 
   if (existeduser) {
     throw new ApiError(404, "user with username or email already exists.");
@@ -86,6 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
     console.log("Uploaded Avatar", avatar);
   } catch (error) {
     console.log("Error uploading avatar", error);
+    // return new ApiError(500, "Failed to upload avatar");
   }
 
   try {
@@ -99,30 +79,30 @@ const registerUser = asyncHandler(async (req, res) => {
       profileImage: avatar?.url || "",
       phone: phone,
       dateOfBirth: DOB,
-    })
-
+    });
 
     // AUTO-ONBOARDING: Create Doctor Profile if role is DOCTOR
     if (userRole === "DOCTOR") {
-        try {
-            console.log("Attempting to create Doctor Profile for:", user._id);
-            await Doctor.create({
-                doctorId: user._id,
-                doctor: username.toLowerCase(), 
-                // Other fields are now optional in schema and can be filled later
-            });
-            console.log("Doctor Profile Created Successfully");
-        } catch (docError) {
-            console.error("DOCTOR PROFILE CREATION FAILED:", JSON.stringify(docError, null, 2));
-            throw docError; // Re-throw to trigger main catch
-        }
-      }    
+      try {
+        console.log("Attempting to create Doctor Profile for:", user._id);
+        await Doctor.create({
+          doctorId: user._id,
+          doctor: username.toLowerCase(),
+          // Other fields are now optional in schema and can be filled later
+        });
+        console.log("Doctor Profile Created Successfully");
+      } catch (docError) {
+        console.error(
+          "DOCTOR PROFILE CREATION FAILED:",
+          JSON.stringify(docError, null, 2)
+        );
+        throw docError; // Re-throw to trigger main catch
+      }
+    }
 
     const createdUser = await User.findOne({ _id: user._id }).select(
       "-password -refreshToken"
     );
-
-    
 
     return res
       .status(200)
@@ -143,85 +123,96 @@ const registerUser = asyncHandler(async (req, res) => {
 
 // Login user
 const loginUser = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body
+  const { username, email, password } = req.body;
 
-  if(!(email || username)) {
-    throw new ApiError(400, "email or username is required")
+  if (!(email || username)) {
+    throw new ApiError(400, "email or username is required");
   }
 
-  if(!password) {
-    throw new ApiError(400, "password is required")
+  if (!password) {
+    throw new ApiError(400, "password is required");
   }
 
   const user = await User.findOne({
-    $or: [{username}, {email}]
-  }).select("+password")
+    $or: [{ username }, { email }],
+  }).select("+password");
 
   if (!user) {
-  throw new ApiError(404, "user not found")
-}
+    throw new ApiError(404, "user not found");
+  }
 
-// validation
+  // validation
 
-const isPasswordValid = await user.isPasswordCorrect(password)
+  const isPasswordValid = await user.isPasswordCorrect(password);
 
-if (!isPasswordValid) {
-  throw new ApiError(401, "invalid password")
-}
+  if (!isPasswordValid) {
+    throw new ApiError(401, "invalid password");
+  }
 
-const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user._id
+  );
 
-const logedInUser = await User.findById(user._id).select("-password -refreshToken")
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
 
-const options = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production"
-}
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  };
 
-return res
-.status(200)
-.cookie("accessToken", accessToken, options)
-.cookie("refreshToken", refreshToken, options)
-.json( new ApiResponse(200, 
-  {user: logedInUser, accessToken, refreshToken},
- "User loggedIn successfully"
-))
-
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser, accessToken, refreshToken },
+        "User loggedIn successfully"
+      )
+    );
 });
 
 // Refresh access token
 const refreshAccessToken = asyncHandler(async (req, res) => {
   try {
-    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
-  
-    if(!incomingRefreshToken) {
-      throw new ApiError(401, "Unauthorized request")
+    const incomingRefreshToken =
+      req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+      throw new ApiError(401, "Unauthorized request");
     }
-  
+
     const decodedToken = jwt.verify(
       incomingRefreshToken,
       process.env.REFRESH_TOKEN_SECRET
-    )
-  
-    const user = await User.findById(decodedToken?._id)
-    
-  
+    );
+
+    const user = await User.findById(decodedToken?._id);
+
+    console.log("User:", user);
+
     if (!user) {
-      throw new ApiError(401, "Invalid refresh token")
+      throw new ApiError(401, "Invalid refresh token");
     }
-  
+
     if (incomingRefreshToken == user?.refreshToken) {
-      throw new ApiError(401, "Refresh token is expired or used")
+      throw new ApiError(401, "Refresh token is expired or used");
     }
-  
+
     const options = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production"
-    }
-  
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
-    
-  
+      secure: process.env.NODE_ENV === "production",
+    };
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id
+    );
+
+    console.log("newRefreshToken", refreshToken);
+
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
@@ -234,37 +225,29 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new ApiError(401, error?.message || "Invalid refresh token")
+    throw new ApiError(401, error?.message || "Invalid refresh token");
   }
 });
 
 // Logout user
 const logoutUser = asyncHandler(async (req, res) => {
-    User.findByIdAndUpdate(
-      req.user._id, 
-      {
-       $set: {
-        refreshToken: undefined
-       } 
-    })
+  await User.findByIdAndUpdate(req.user._id, {
+    $set: {
+      refreshToken: undefined,
+    },
+  });
 
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production"
-    }
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  };
 
-    return res
+  return res
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json( new ApiResponse(200, "User loggedOut successfully"))
-
+    .json(new ApiResponse(200, "User loggedOut successfully"));
 });
 
 // Exporting all controller functions
-export {
-    registerUser,
-    loginUser,
-    logoutUser,
-    refreshAccessToken,
-}
+export { registerUser, loginUser, logoutUser, refreshAccessToken };
