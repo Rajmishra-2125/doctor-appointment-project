@@ -10,7 +10,17 @@ const appointmentSchema = new Schema(
     },
     doctorId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Doctor",
+      required: true,
+      index: true,
+    },
+    slotId: {
+      type: Schema.Types.ObjectId,
+      ref: "Slot",
+      required: true,
+    },
+    slotNumber: {
+      type: Number,
       required: true,
       index: true,
     },
@@ -25,7 +35,14 @@ const appointmentSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["CONFIRMED", "COMPLETED", "CANCELLED", "PENDING", "RESCHEDULED", "NO_SHOW"],
+      enum: [
+        "CONFIRMED",
+        "COMPLETED",
+        "CANCELLED",
+        "PENDING",
+        "RESCHEDULED",
+        "NO_SHOW",
+      ],
       default: "PENDING",
       index: true,
     },
@@ -88,17 +105,21 @@ const appointmentSchema = new Schema(
 
     // Prescription Information & Notes
     prescription: {
-      medications: [{
-        name: String,
-        dosage: String,
-        frequency: String,
-        duration: String,
-        instructions: String,
-      }],
-      tests: [{
-        name: String,
-        instructions: String,
-      }],
+      medications: [
+        {
+          name: String,
+          dosage: String,
+          frequency: String,
+          duration: String,
+          instructions: String,
+        },
+      ],
+      tests: [
+        {
+          name: String,
+          instructions: String,
+        },
+      ],
       advice: String,
       followUpDate: Date,
     },
