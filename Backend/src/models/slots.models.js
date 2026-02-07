@@ -60,5 +60,4 @@ slotSchema.index(
   },
   { unique: true });
 
-
 export const Slot = mongoose.model("Slot", slotSchema)
