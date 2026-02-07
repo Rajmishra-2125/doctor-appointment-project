@@ -75,5 +75,4 @@ const patientSchema = new Schema(
 
 const Patient = mongoose.model("Patient", patientSchema);
 
-
 export { Patient };
