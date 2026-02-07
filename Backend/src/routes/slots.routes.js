@@ -1,18 +1,23 @@
 import { Router } from "express";
 import {
-  createingNewSlots,
+  createManualSlot,
+  generateAutoSlots,
   deleteSlot,
 } from "../controllers/slots.controllers.js";
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 
 const router = Router();
 
-// Creating availability by doctor
-router.route("/generateSlot").post(verifyJWT, createingNewSlots);
+// Secure all routes
+router.use(verifyJWT);
 
-router.route("/deleteslot").post(verifyJWT, deleteSlot);
+// Generate auto slots
+router.route("/generate").post(generateAutoSlots);
 
+// Create manual slot
+router.route("/create").post(createManualSlot);
 
-
+// Delete slot
+router.route("/delete").delete(deleteSlot);
 
 export default router;
