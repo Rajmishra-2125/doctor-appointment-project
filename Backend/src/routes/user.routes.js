@@ -1,14 +1,14 @@
 import { Router } from "express";
 import {
-         getCurrentUser,
-         updateAccountDetails,
-         updateUserAvatar,
-         changeCurrentPassword,
-         deleteAccount 
-        } from "../controllers/user.controllers.js";
+  getCurrentUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  changeCurrentPassword,
+  deleteAccount,
+  recoverDeletedAccount,
+} from "../controllers/user.controllers.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
-
 
 const router = Router();
 
@@ -18,7 +18,7 @@ const router = Router();
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 
 // Update account details
-router.route('/update-account').patch(verifyJWT, updateAccountDetails)
+router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 
 // Update user avatar
 router
@@ -30,5 +30,8 @@ router.route("/change-password").patch(verifyJWT, changeCurrentPassword);
 
 // Delete user account
 router.route("/delete-account").delete(verifyJWT, deleteAccount);
+
+// Recover user account
+router.route("/recover-account").post(recoverDeletedAccount);
 
 export default router;
