@@ -375,9 +375,9 @@ Otherwise, continue the conversation naturally to gather information.`;
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
-      <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white py-16">
+      <div className="bg-linear-to-r from-blue-600 to-indigo-700 dark:from-blue-900 dark:to-indigo-900 text-white py-16 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-4">
             <Link
@@ -390,7 +390,7 @@ Otherwise, continue the conversation naturally to gather information.`;
               <h1 className="text-4xl md:text-5xl font-bold">
                 Book Appointment
               </h1>
-              <p className="text-xl text-blue-100 mt-2">
+              <p className="text-xl text-blue-100 dark:text-blue-200 mt-2">
                 Schedule your consultation with our expert doctors
               </p>
             </div>
@@ -400,15 +400,15 @@ Otherwise, continue the conversation naturally to gather information.`;
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-md mb-8">
-          <div className="border-b border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md mb-8 transition-colors duration-200">
+          <div className="border-b border-gray-200 dark:border-gray-700">
             <nav className="flex -mb-px">
               <button
                 onClick={() => setActiveTab("book")}
                 className={`flex items-center gap-2 px-6 py-4 border-b-2 font-semibold transition-colors ${
                   activeTab === "book"
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
               >
                 <Calendar className="w-5 h-5" />
@@ -419,7 +419,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                 className={`flex items-center gap-2 px-6 py-4 border-b-2 font-semibold transition-colors ${
                   activeTab === "myAppointments"
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
               >
                 <Activity className="w-5 h-5" />
@@ -435,7 +435,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                 className={`flex items-center gap-2 px-6 py-4 border-b-2 font-semibold transition-colors ${
                   activeTab === "aiAssistant"
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
               >
                 <Bot className="w-5 h-5" />
@@ -451,8 +451,8 @@ Otherwise, continue the conversation naturally to gather information.`;
             {/* Booking Form */}
             <div className="lg:col-span-2">
               {!bookingSuccess ? (
-                <div className="bg-white rounded-xl shadow-md p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 transition-colors duration-200">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                     Patient Information
                   </h2>
 
@@ -461,7 +461,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                     <div className="space-y-6 mb-8">
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Full Name *
                           </label>
                           <div className="relative">
@@ -471,7 +471,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                               name="patientName"
                               value={formData.patientName}
                               onChange={handleInputChange}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                                 formErrors.patientName
                                   ? "border-red-500"
                                   : "border-gray-300"
@@ -487,7 +487,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Email Address *
                           </label>
                           <div className="relative">
@@ -497,7 +497,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                               name="email"
                               value={formData.email}
                               onChange={handleInputChange}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                                 formErrors.email
                                   ? "border-red-500"
                                   : "border-gray-300"
@@ -515,7 +515,7 @@ Otherwise, continue the conversation naturally to gather information.`;
 
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Phone Number *
                           </label>
                           <div className="relative">
@@ -525,7 +525,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                               name="phone"
                               value={formData.phone}
                               onChange={handleInputChange}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                                 formErrors.phone
                                   ? "border-red-500"
                                   : "border-gray-300"
@@ -542,7 +542,7 @@ Otherwise, continue the conversation naturally to gather information.`;
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Age *
                             </label>
                             <input
@@ -550,7 +550,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                               name="age"
                               value={formData.age}
                               onChange={handleInputChange}
-                              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                                 formErrors.age
                                   ? "border-red-500"
                                   : "border-gray-300"
@@ -567,14 +567,14 @@ Otherwise, continue the conversation naturally to gather information.`;
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Gender *
                             </label>
                             <select
                               name="gender"
                               value={formData.gender}
                               onChange={handleInputChange}
-                              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                                 formErrors.gender
                                   ? "border-red-500"
                                   : "border-gray-300"
@@ -595,7 +595,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Address
                         </label>
                         <div className="relative">
@@ -604,7 +604,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                             name="address"
                             value={formData.address}
                             onChange={handleInputChange}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                             placeholder="123 Main St, City, State"
                             rows="2"
                           />
@@ -613,20 +613,20 @@ Otherwise, continue the conversation naturally to gather information.`;
                     </div>
 
                     {/* Appointment Details */}
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                       Appointment Details
                     </h3>
                     <div className="space-y-6 mb-8">
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Select Doctor *
                           </label>
                           <select
                             name="selectedDoctor"
                             value={formData.selectedDoctor}
                             onChange={handleDoctorChange}
-                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                               formErrors.selectedDoctor
                                 ? "border-red-500"
                                 : "border-gray-300"
@@ -647,7 +647,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Specialty
                           </label>
                           <input
@@ -655,7 +655,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                             name="specialty"
                             value={formData.specialty}
                             readOnly
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-600 text-gray-900 dark:text-white cursor-not-allowed"
                             placeholder="Auto-filled"
                           />
                         </div>
@@ -663,7 +663,7 @@ Otherwise, continue the conversation naturally to gather information.`;
 
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Appointment Date *
                           </label>
                           <div className="relative">
@@ -674,7 +674,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                               value={formData.appointmentDate}
                               onChange={handleInputChange}
                               min={today}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                                 formErrors.appointmentDate
                                   ? "border-red-500"
                                   : "border-gray-300"
@@ -689,7 +689,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Appointment Time *
                           </label>
                           <div className="relative">
@@ -698,7 +698,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                               name="appointmentTime"
                               value={formData.appointmentTime}
                               onChange={handleInputChange}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                                 formErrors.appointmentTime
                                   ? "border-red-500"
                                   : "border-gray-300"
@@ -721,7 +721,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Appointment Type *
                         </label>
                         <div className="grid grid-cols-2 gap-4">
@@ -735,8 +735,8 @@ Otherwise, continue the conversation naturally to gather information.`;
                             }
                             className={`p-4 border-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
                               formData.appointmentType === "in-person"
-                                ? "border-blue-600 bg-blue-50 text-blue-600"
-                                : "border-gray-300 hover:border-blue-300"
+                                ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                                : "border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-700 text-gray-700 dark:text-gray-300"
                             }`}
                           >
                             <Building className="w-5 h-5" />
@@ -752,8 +752,8 @@ Otherwise, continue the conversation naturally to gather information.`;
                             }
                             className={`p-4 border-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
                               formData.appointmentType === "video"
-                                ? "border-blue-600 bg-blue-50 text-blue-600"
-                                : "border-gray-300 hover:border-blue-300"
+                                ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                                : "border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-700 text-gray-700 dark:text-gray-300"
                             }`}
                           >
                             <Video className="w-5 h-5" />
@@ -763,7 +763,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Reason for Visit *
                         </label>
                         <div className="relative">
@@ -772,7 +772,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                             name="reason"
                             value={formData.reason}
                             onChange={handleInputChange}
-                            className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                               formErrors.reason
                                 ? "border-red-500"
                                 : "border-gray-300"
@@ -789,21 +789,21 @@ Otherwise, continue the conversation naturally to gather information.`;
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Current Symptoms (Optional)
                         </label>
                         <textarea
                           name="symptoms"
                           value={formData.symptoms}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                           placeholder="List any current symptoms..."
                           rows="2"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Insurance Provider (Optional)
                         </label>
                         <div className="relative">
@@ -813,7 +813,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                             name="insurance"
                             value={formData.insurance}
                             onChange={handleInputChange}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                             placeholder="Insurance company name"
                           />
                         </div>
@@ -842,7 +842,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                       <button
                         type="button"
                         onClick={resetForm}
-                        className="px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-colors"
+                        className="px-6 py-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold transition-colors"
                       >
                         Reset
                       </button>
@@ -851,62 +851,66 @@ Otherwise, continue the conversation naturally to gather information.`;
                 </div>
               ) : (
                 // Success Message
-                <div className="bg-white rounded-xl shadow-md p-8">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 transition-colors duration-200">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                      <CheckCircle className="w-10 h-10 text-green-600" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+                      <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-500" />
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                       Appointment Confirmed!
                     </h2>
-                    <p className="text-gray-600 mb-8">
+                    <p className="text-gray-600 dark:text-gray-400 mb-8">
                       Your appointment has been successfully booked
                     </p>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-6">
                       <div className="grid md:grid-cols-2 gap-4 text-left">
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                             Appointment ID
                           </p>
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-gray-900 dark:text-white">
                             {bookedAppointmentDetails?.id}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                             Patient Name
                           </p>
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-gray-900 dark:text-white">
                             {formData.patientName}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">Doctor</p>
-                          <p className="font-bold text-gray-900">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            Doctor
+                          </p>
+                          <p className="font-bold text-gray-900 dark:text-white">
                             {formData.selectedDoctor}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                             Specialty
                           </p>
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-gray-900 dark:text-white">
                             {formData.specialty}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                             Date & Time
                           </p>
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-gray-900 dark:text-white">
                             {formData.appointmentDate} at{" "}
                             {formData.appointmentTime}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">Type</p>
-                          <p className="font-bold text-gray-900">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            Type
+                          </p>
+                          <p className="font-bold text-gray-900 dark:text-white">
                             {formData.appointmentType === "video"
                               ? "Video Consultation"
                               : "In-Person Visit"}
@@ -925,7 +929,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                       </button>
                       <button
                         onClick={resetForm}
-                        className="inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+                        className="inline-flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg font-semibold transition-colors"
                       >
                         <Calendar className="w-5 h-5" />
                         Book Another
@@ -939,12 +943,12 @@ Otherwise, continue the conversation naturally to gather information.`;
             {/* Info Sidebar */}
             <div className="space-y-6">
               {/* Quick Tips */}
-              <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-blue-600" />
+              <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 rounded-xl p-6 border border-blue-200 dark:border-gray-700">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   Before Your Appointment
                 </h3>
-                <ul className="space-y-2 text-sm text-gray-700">
+                <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
                     <span>Arrive 15 minutes early</span>
@@ -954,40 +958,48 @@ Otherwise, continue the conversation naturally to gather information.`;
                     <span>Bring insurance card and ID</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5 shrink-0" />
                     <span>List current medications</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5 shrink-0" />
                     <span>Prepare questions for doctor</span>
                   </li>
                 </ul>
               </div>
 
               {/* Need Help */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Need Help?</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-transparent dark:border-gray-700 transition-colors duration-200">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-4">
+                  Need Help?
+                </h3>
                 <div className="space-y-3">
                   <button
                     onClick={() => setActiveTab("aiAssistant")}
-                    className="w-full flex items-center gap-3 p-3 bg-linear-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-lg transition-colors"
+                    className="w-full flex items-center gap-3 p-3 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30 rounded-lg transition-colors border border-transparent dark:border-gray-700"
                   >
-                    <Bot className="w-5 h-5 text-blue-600" />
+                    <Bot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     <div className="text-left">
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         AI Assistant
                       </p>
-                      <p className="text-xs text-gray-600">Get instant help</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Get instant help
+                      </p>
                     </div>
                   </button>
                   <a
                     href="tel:+1234567890"
-                    className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="w-full flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors border border-transparent dark:border-gray-600"
                   >
-                    <Phone className="w-5 h-5 text-gray-600" />
+                    <Phone className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     <div className="text-left">
-                      <p className="font-semibold text-gray-900">Call Us</p>
-                      <p className="text-xs text-gray-600">+1 234 567 890</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        Call Us
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        +1 234 567 890
+                      </p>
                     </div>
                   </a>
                 </div>
@@ -995,8 +1007,8 @@ Otherwise, continue the conversation naturally to gather information.`;
 
               {/* Selected Doctor Info */}
               {selectedDoctor && (
-                <div className="bg-white rounded-xl shadow-md p-6">
-                  <h3 className="font-bold text-gray-900 mb-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-transparent dark:border-gray-700 transition-colors duration-200">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-4">
                     Selected Doctor
                   </h3>
                   <div className="flex items-start gap-4">
@@ -1006,15 +1018,15 @@ Otherwise, continue the conversation naturally to gather information.`;
                       className="w-16 h-16 rounded-full object-cover"
                     />
                     <div>
-                      <p className="font-bold text-gray-900">
+                      <p className="font-bold text-gray-900 dark:text-white">
                         {selectedDoctor.name}
                       </p>
-                      <p className="text-sm text-blue-600">
+                      <p className="text-sm text-blue-600 dark:text-blue-400">
                         {selectedDoctor.specialty}
                       </p>
                       <div className="flex items-center gap-1 mt-1">
                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                        <span className="text-sm font-semibold">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                           {selectedDoctor.rating}
                         </span>
                       </div>
@@ -1029,18 +1041,18 @@ Otherwise, continue the conversation naturally to gather information.`;
         {/* My Appointments Tab */}
         {activeTab === "myAppointments" && (
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 transition-colors duration-200">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 My Appointments
               </h2>
 
               {myAppointments.length === 0 ? (
                 <div className="text-center py-12">
-                  <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <Calendar className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                     No Appointments
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
                     You haven't booked any appointments yet
                   </p>
                   <button
@@ -1055,7 +1067,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                   {myAppointments.map((appointment) => (
                     <div
                       key={appointment.id}
-                      className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow"
+                      className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow bg-white dark:bg-gray-800"
                     >
                       <div className="flex flex-col md:flex-row gap-6">
                         <img
@@ -1067,23 +1079,23 @@ Otherwise, continue the conversation naturally to gather information.`;
                         <div className="flex-1">
                           <div className="flex items-start justify-between mb-4">
                             <div>
-                              <p className="text-sm text-gray-500 mb-1">
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                                 Appointment ID: {appointment.id}
                               </p>
-                              <h3 className="text-xl font-bold text-gray-900 mb-1">
+                              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
                                 {appointment.doctorName}
                               </h3>
-                              <p className="text-blue-600 font-medium">
+                              <p className="text-blue-600 dark:text-blue-400 font-medium">
                                 {appointment.specialty}
                               </p>
                             </div>
                             <span
                               className={`px-4 py-2 rounded-full text-sm font-semibold ${
                                 appointment.status === "Upcoming"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                                   : appointment.status === "Completed"
-                                    ? "bg-gray-100 text-gray-700"
-                                    : "bg-yellow-100 text-yellow-700"
+                                    ? "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                    : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
                               }`}
                             >
                               {appointment.status}
@@ -1091,28 +1103,32 @@ Otherwise, continue the conversation naturally to gather information.`;
                           </div>
 
                           <div className="grid md:grid-cols-3 gap-4 mb-4">
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <Calendar className="w-5 h-5 text-gray-400" />
+                            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                              <Calendar className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                               <div>
-                                <p className="text-xs text-gray-500">Date</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  Date
+                                </p>
                                 <p className="font-medium">
                                   {appointment.date}
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <Clock className="w-5 h-5 text-gray-400" />
+                            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                              <Clock className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                               <div>
-                                <p className="text-xs text-gray-500">Time</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  Time
+                                </p>
                                 <p className="font-medium">
                                   {appointment.time}
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <MapPin className="w-5 h-5 text-gray-400" />
+                            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                              <MapPin className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                               <div>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
                                   Location
                                 </p>
                                 <p className="font-medium">
@@ -1134,11 +1150,11 @@ Otherwise, continue the conversation naturally to gather information.`;
                                 <Calendar className="w-4 h-4" />
                                 Reschedule
                               </button>
-                              <button className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold transition-colors">
+                              <button className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg font-semibold transition-colors">
                                 <Download className="w-4 h-4" />
                                 Download
                               </button>
-                              <button className="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-semibold transition-colors">
+                              <button className="inline-flex items-center gap-2 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-lg font-semibold transition-colors">
                                 <X className="w-4 h-4" />
                                 Cancel
                               </button>
@@ -1156,13 +1172,13 @@ Otherwise, continue the conversation naturally to gather information.`;
 
         {/* AI Assistant Tab */}
         {activeTab === "aiAssistant" && (
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            <div className="bg-linear-to-r from-blue-600 to-indigo-600 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-colors duration-200">
+            <div className="bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 p-6">
               <div className="flex items-center gap-3 text-white">
                 <Bot className="w-8 h-8" />
                 <div>
                   <h2 className="text-2xl font-bold">AI Booking Assistant</h2>
-                  <p className="text-blue-100">
+                  <p className="text-blue-100 dark:text-blue-200">
                     Get instant help with appointment booking
                   </p>
                 </div>
@@ -1171,7 +1187,7 @@ Otherwise, continue the conversation naturally to gather information.`;
 
             <div className="flex flex-col h-150">
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900">
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
@@ -1181,12 +1197,12 @@ Otherwise, continue the conversation naturally to gather information.`;
                       className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                         msg.role === "user"
                           ? "bg-blue-600 text-white rounded-br-none"
-                          : "bg-white text-gray-800 shadow-md rounded-bl-none"
+                          : "bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md rounded-bl-none border border-gray-100 dark:border-gray-700"
                       }`}
                     >
                       <div className="flex items-start gap-2">
                         {msg.role === "assistant" && (
-                          <Bot className="w-5 h-5 mt-1 shrink-0 text-blue-600" />
+                          <Bot className="w-5 h-5 mt-1 shrink-0 text-blue-600 dark:text-blue-400" />
                         )}
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                       </div>
@@ -1195,8 +1211,8 @@ Otherwise, continue the conversation naturally to gather information.`;
                 ))}
                 {isChatLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-white rounded-2xl px-4 py-3 shadow-md">
-                      <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-md border border-gray-100 dark:border-gray-700">
+                      <Loader2 className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
                     </div>
                   </div>
                 )}
@@ -1204,7 +1220,7 @@ Otherwise, continue the conversation naturally to gather information.`;
               </div>
 
               {/* Input */}
-              <div className="p-6 bg-white border-t">
+              <div className="p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -1212,7 +1228,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyPress={handleChatKeyPress}
                     placeholder="Type your message..."
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                     disabled={isChatLoading}
                   />
                   <button
@@ -1223,7 +1239,7 @@ Otherwise, continue the conversation naturally to gather information.`;
                     <Send className="w-5 h-5" />
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2 text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
                   AI assistant can help you book appointments, find doctors, and
                   answer questions
                 </p>
