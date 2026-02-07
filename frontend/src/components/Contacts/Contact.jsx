@@ -112,7 +112,7 @@ function Contact() {
       address: "123 Healthcare Avenue, New York, NY 10001",
       phone: "+1 (555) 123-4567",
       hours: "Mon-Fri: 8AM-8PM, Sat: 9AM-6PM",
-      services: ["Emergency Care", "Surgery", "Diagnostics", "Outpatient"],
+      services: ["Emergency Care", "Surgery", "Diagnostics"],
     },
     {
       name: "Downtown Clinic",
@@ -265,9 +265,9 @@ function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Hero Section */}
-      <section className="relative bg-linear-to-r from-blue-600 to-indigo-700 text-white py-20">
+      <section className="relative bg-linear-to-r from-blue-600 to-indigo-700 dark:from-blue-900 dark:to-indigo-900 text-white py-20 transition-colors duration-200">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
@@ -289,11 +289,9 @@ function Contact() {
             {contactInfo.map((info, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
               >
-                <div
-                  className={`bg-linear-to-r ${info.color} p-6 text-white`}
-                >
+                <div className={`bg-linear-to-r ${info.color} p-6 text-white`}>
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl mb-4">
                     <info.icon className="w-8 h-8" />
                   </div>
@@ -305,7 +303,7 @@ function Contact() {
                       <p className="text-xs text-gray-500 mb-1">
                         {detail.label}
                       </p>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {detail.value}
                       </p>
                     </div>
@@ -323,8 +321,8 @@ function Contact() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Contact Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-md p-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8 transition-colors duration-200">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
                   Send Us a Message
                 </h2>
 
@@ -334,7 +332,7 @@ function Contact() {
                       {/* Name and Email */}
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Full Name *
                           </label>
                           <div className="relative">
@@ -344,12 +342,12 @@ function Contact() {
                               name="name"
                               value={formData.name}
                               onChange={handleInputChange}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              placeholder="John Doe"
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
                                 formErrors.name
                                   ? "border-red-500"
-                                  : "border-gray-300"
+                                  : "border-gray-300 dark:border-gray-600"
                               }`}
-                              placeholder="John Doe"
                             />
                           </div>
                           {formErrors.name && (
@@ -360,7 +358,7 @@ function Contact() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Email Address *
                           </label>
                           <div className="relative">
@@ -370,12 +368,12 @@ function Contact() {
                               name="email"
                               value={formData.email}
                               onChange={handleInputChange}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              placeholder="john@example.com"
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
                                 formErrors.email
                                   ? "border-red-500"
-                                  : "border-gray-300"
+                                  : "border-gray-300 dark:border-gray-600"
                               }`}
-                              placeholder="john@example.com"
                             />
                           </div>
                           {formErrors.email && (
@@ -389,7 +387,7 @@ function Contact() {
                       {/* Phone and Department */}
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Phone Number *
                           </label>
                           <div className="relative">
@@ -399,12 +397,12 @@ function Contact() {
                               name="phone"
                               value={formData.phone}
                               onChange={handleInputChange}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              placeholder="+1 (555) 123-4567"
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
                                 formErrors.phone
                                   ? "border-red-500"
-                                  : "border-gray-300"
+                                  : "border-gray-300 dark:border-gray-600"
                               }`}
-                              placeholder="+1 (555) 123-4567"
                             />
                           </div>
                           {formErrors.phone && (
@@ -415,7 +413,7 @@ function Contact() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Department *
                           </label>
                           <div className="relative">
@@ -424,10 +422,10 @@ function Contact() {
                               name="department"
                               value={formData.department}
                               onChange={handleInputChange}
-                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
                                 formErrors.department
                                   ? "border-red-500"
-                                  : "border-gray-300"
+                                  : "border-gray-300 dark:border-gray-600"
                               }`}
                             >
                               <option value="">Select Department</option>
@@ -448,7 +446,7 @@ function Contact() {
 
                       {/* Subject */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Subject *
                         </label>
                         <div className="relative">
@@ -475,19 +473,19 @@ function Contact() {
 
                       {/* Message */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Message *
                         </label>
                         <textarea
                           name="message"
                           value={formData.message}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          placeholder="Tell us more about your inquiry..."
+                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
                             formErrors.message
                               ? "border-red-500"
-                              : "border-gray-300"
+                              : "border-gray-300 dark:border-gray-600"
                           }`}
-                          placeholder="Tell us more about your inquiry..."
                           rows="6"
                         />
                         {formErrors.message && (
@@ -499,7 +497,7 @@ function Contact() {
 
                       {/* Preferred Contact Method */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                           Preferred Contact Method
                         </label>
                         <div className="flex gap-4">
@@ -512,7 +510,9 @@ function Contact() {
                               onChange={handleInputChange}
                               className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                             />
-                            <span className="text-gray-700">Email</span>
+                            <span className="text-gray-700 dark:text-gray-300">
+                              Email
+                            </span>
                           </label>
                           <label className="flex items-center gap-2 cursor-pointer">
                             <input
@@ -523,7 +523,9 @@ function Contact() {
                               onChange={handleInputChange}
                               className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                             />
-                            <span className="text-gray-700">Phone</span>
+                            <span className="text-gray-700 dark:text-gray-300">
+                              Phone
+                            </span>
                           </label>
                         </div>
                       </div>
@@ -553,10 +555,10 @@ function Contact() {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
                       <CheckCircle className="w-10 h-10 text-green-600" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                       Message Sent Successfully!
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
                       Thank you for contacting us. We'll get back to you within
                       24 hours.
                     </p>
@@ -569,42 +571,52 @@ function Contact() {
             <div className="space-y-6">
               {/* Quick Actions */}
               <div className="bg-white rounded-2xl shadow-md p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                   Quick Actions
                 </h3>
                 <div className="space-y-3">
                   <Link
                     to="/doctors/appointments"
-                    className="flex items-center gap-3 p-4 bg-linear-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-lg transition-colors group"
+                    className="flex items-center gap-3 p-4 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30 rounded-lg transition-colors group"
                   >
                     <Calendar className="w-6 h-6 text-blue-600" />
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         Book Appointment
                       </p>
-                      <p className="text-xs text-gray-600">Schedule online</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Schedule online
+                      </p>
                     </div>
                   </Link>
 
                   <a
                     href="tel:+15551234568"
-                    className="flex items-center gap-3 p-4 bg-linear-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 rounded-lg transition-colors"
+                    className="flex items-center gap-3 p-4 bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/30 dark:hover:to-emerald-900/30 rounded-lg transition-colors"
                   >
                     <PhoneCall className="w-6 h-6 text-green-600" />
                     <div>
-                      <p className="font-semibold text-gray-900">Call Us Now</p>
-                      <p className="text-xs text-gray-600">+1 (555) 123-4568</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        Call Us Now
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        +1 (555) 123-4568
+                      </p>
                     </div>
                   </a>
 
                   <a
                     href="#"
-                    className="flex items-center gap-3 p-4 bg-linear-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 rounded-lg transition-colors"
+                    className="flex items-center gap-3 p-4 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/30 dark:hover:to-pink-900/30 rounded-lg transition-colors"
                   >
                     <MessageCircle className="w-6 h-6 text-purple-600" />
                     <div>
-                      <p className="font-semibold text-gray-900">Live Chat</p>
-                      <p className="text-xs text-gray-600">Chat with support</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        Live Chat
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Chat with support
+                      </p>
                     </div>
                   </a>
                 </div>
@@ -630,7 +642,7 @@ function Contact() {
 
               {/* Social Media */}
               <div className="bg-white rounded-2xl shadow-md p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                   Connect With Us
                 </h3>
                 <div className="flex gap-3">
@@ -638,7 +650,7 @@ function Contact() {
                     <a
                       key={idx}
                       href={social.url}
-                      className={`flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors ${social.color}`}
+                      className={`flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors ${social.color}`}
                       title={social.name}
                     >
                       <social.icon className="w-5 h-5" />
@@ -648,27 +660,35 @@ function Contact() {
               </div>
 
               {/* Support Hours */}
-              <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-                <div className="flex items-center gap-2 text-blue-600 mb-3">
+              <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-900/30">
+                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-3">
                   <Headphones className="w-5 h-5" />
-                  <h3 className="font-bold text-gray-900">Support Hours</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-white">
+                    Support Hours
+                  </h3>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Mon - Fri:</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Mon - Fri:
+                    </span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       8 AM - 8 PM
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Saturday:</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Saturday:
+                    </span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       9 AM - 6 PM
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Sunday:</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Sunday:
+                    </span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       10 AM - 4 PM
                     </span>
                   </div>
@@ -680,13 +700,13 @@ function Contact() {
       </section>
 
       {/* Office Locations */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-gray-900 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Our Locations
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 dark:text-gray-400">
               Visit us at any of our convenient locations
             </p>
           </div>
@@ -695,26 +715,26 @@ function Contact() {
             {locations.map((location, index) => (
               <div
                 key={index}
-                className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow border border-gray-200"
+                className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700"
               >
                 <div className="flex items-start gap-3 mb-4">
-                  <MapPinned className="w-6 h-6 text-blue-600 shrink-0 mt-1" />
+                  <MapPinned className="w-6 h-6 text-blue-600 dark:text-blue-400 shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                       {location.name}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-3">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
                       {location.address}
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Phone className="w-4 h-4" />
                     <span>{location.phone}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Clock className="w-4 h-4" />
                     <span>{location.hours}</span>
                   </div>
@@ -728,7 +748,7 @@ function Contact() {
                     {location.services.map((service, idx) => (
                       <span
                         key={idx}
-                        className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full"
+                        className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full"
                       >
                         {service}
                       </span>
@@ -753,21 +773,25 @@ function Contact() {
           <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-100 to-indigo-100">
             <div className="text-center">
               <MapPin className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-              <p className="text-gray-700 font-semibold">Interactive Map</p>
-              <p className="text-sm text-gray-600">Google Maps Integration</p>
+              <p className="text-gray-700 dark:text-gray-300 font-semibold">
+                Interactive Map
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Google Maps Integration
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Frequently Asked Questions
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 dark:text-gray-400">
               Find answers to common questions
             </p>
           </div>
@@ -776,15 +800,15 @@ function Contact() {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl shadow-md overflow-hidden"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-colors duration-200"
               >
                 <button
                   onClick={() =>
                     setExpandedFaq(expandedFaq === index ? null : index)
                   }
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <span className="font-semibold text-gray-900 pr-4">
+                  <span className="font-semibold text-gray-900 dark:text-white pr-4">
                     {faq.question}
                   </span>
                   {expandedFaq === index ? (
@@ -795,7 +819,7 @@ function Contact() {
                 </button>
                 {expandedFaq === index && (
                   <div className="px-6 pb-6">
-                    <p className="text-gray-700 leading-relaxed">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>
