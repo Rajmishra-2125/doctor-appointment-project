@@ -46,7 +46,6 @@ followSchema.pre(/^find/, function (next) {
    if (!this.getOptions().includeDeleted) {
        this.find({ isDeleted: false });
    }
-  //  next();
 });
 
 export const Follow = mongoose.model("Follow", followSchema)
