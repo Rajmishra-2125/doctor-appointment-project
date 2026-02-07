@@ -25,19 +25,42 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 // Update account details
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullname, email } = req.body
+  const {
+    fullname,
+    email,
+    phone,
+    gender,
+    dateOfBirth,
+    street,
+    city,
+    state,
+    zipCode,
+    country,
+  } = req.body;
 
   if(!fullname || !email) {
     throw new ApiError(401, "all fields are required")
   }
 
+  const updateData = {
+    fullname, 
+    email, 
+    phone,
+    gender, 
+    dateOfBirth,
+    address: {
+      street, 
+      city, 
+      state,
+      zipCode,
+      country
+    }
+  };
+
   const user = await User.findByIdAndUpdate(
     req.user?._id, 
     {
-      $set: {
-        fullname,
-        email: email
-      }
+      $set: updateData
     }, 
     {
       new: true,
@@ -50,6 +73,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     new ApiResponse(200, user, "Profile updated successfully.")
   )
 });
+
 
 // Update user avatar
 const updateUserAvatar = asyncHandler(async (req, res) => {
@@ -86,6 +110,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     "Avatar image updated successfully"))
 });
 
+
 // Change current password
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
@@ -107,14 +132,22 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "password changed successfully"));
 });
 
+
 // Soft delete user account
 const deleteAccount = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { reason, confirmationPassword } = req.body;
 
+  if (!confirmationPassword) {
+    throw new ApiError(
+      400,
+      "Password confirmation is required to delete account"
+    );
+  }
+
   // Verify password
   const user = await User.findById(userId).select("+password");
-  const isPasswordValid = await User.comparePassword(confirmationPassword);
+  const isPasswordValid = await User.isPasswordCorrect(confirmationPassword);
 
   if (!isPasswordValid) {
     throw new ApiError(400, "Invalid password confirmation");
@@ -134,107 +167,117 @@ const deleteAccount = asyncHandler(async (req, res) => {
     user.accountStatus = "PENDING_DELETION";
     user.isActive = false;
     user.deletionScheduledAt = new Date();
-    user.deletionExecutionDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    user.deletionExecutionDate = new Date(
+      Date.now() + 30 * 24 * 60 * 60 * 1000
+    );
     user.deletionReason = reason || "User requested deletion";
     await user.save({ session });
 
+
     // Handle doctor deletion
     if (user.role === "DOCTOR") {
-      // Cancel future appointments
-      await Appointment.updateMany(
-        { doctorId: userId },
+      // 1. Find the Doctor Profile ID
+      const doctorProfile = await Doctor.findOne({ doctorId: userId });
+
+      const targetDoctorId = doctorProfile ? doctorProfile._id : null;
+
+      if (targetDoctorId) {
+        // Cancel future appointments using Doctor Profile ID
+        const futureAppointments = await Appointment.updateMany(
+          {
+            doctorId: targetDoctorId,
+            date: { $gte: new Date() },
+            status: { $in: ["PENDING", "CONFIRMED"] },
+          },
+          {
+            status: "CANCELLED",
+            cancellationReason: "Account deactivated",
+            cancelledAt: new Date(),
+            cancelledBy: userId,
+          },
+          { session }
+        );
+
+        // Soft delete all reviews by this doctor (as recipient)
+        await Review.updateMany(
+          { doctorId: targetDoctorId },
+          {
+            isDeleted: true,
+            deletedAt: new Date(),
+          },
+          { session }
+        );
+
+        // Soft delete all follows for this doctor
+        await Follow.updateMany(
+          { doctorId: targetDoctorId },
+          {
+            isDeleted: true,
+            deletedAt: new Date(),
+          },
+          { session }
+        );
+
+        console.log(
+          `Doctor ${user.email} (Profile: ${targetDoctorId}): Cancelled ${futureAppointments.modifiedCount} future appointments.`
+        );
+
+        // Hide Profile
+        await Doctor.findByIdAndUpdate(
+          targetDoctorId,
+          { isVisible: false, isAcceptingNewPatients: false },
+          { session }
+        );
+      } else {
+        console.warn(
+          `Doctor User ${userId} has no Doctor Profile. Skipping cascading deletes.`
+        );
+      }
+    } else if (user.role === "PATIENT") {
+      // Cancel all future appointments
+      const futureAppointments = await Appointment.updateMany(
         {
-          isVisible: false,
-          isAcceptingNewPatients: false,
+          patientId: userId,
+          date: { $gte: new Date() },
+          status: { $in: ["PENDING", "CONFIRMED"] },
+        },
+        {
+          status: "CANCELLED",
+          cancellationReason: "Account deactivated",
+          cancelledAt: new Date(),
+          cancelledBy: userId,
         },
         { session }
       );
-    
 
-    // Cancel all future appointments
+      // Soft delete all reviews by this patient (as author)
+      await Review.updateMany(
+        { patientId: userId },
+        {
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+        { session }
+      );
 
-    const futureAppointments = await Appointment.updateMany(
-      {
-        doctorId: userId,
-        date: { $gte: new Date() },
-        status: { $in: ["PENDING", "CONFIRMED"] },
-      },
-      {
-        status: "CANCELLED",
-        cancellationReason: "Account deactivated",
-        cancelledAt: new Date(),
-        cancelledBy: userId,
-      },
-      { session }
-    );
+      // Soft delete all follows by this patient
+      await Follow.updateMany(
+        { patientId: userId },
+        {
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+        { session }
+      );
 
-    // Soft delete all reviews by this doctor
-    await Review.updateMany(
-      { doctorId: userId },
-      {
-        isDeleted: true,
-        deletedAt: new Date()
-      },
-      { session }
-    );
-
-    // Soft delete all follows by this doctor
-    await Follow.updateMany(
-      { doctorId: userId },
-      {
-        isDeleted: true,
-        deletedAt: new Date()
-      },
-      { session }
-    );
-
-    console.log(`Doctor ${user.email}: Cancelled ${futureAppointments.modifiedCount} future appointments.`);
-
-  } else if (user.role === "PATIENT") {
-
-    // Cancel all future appointments
-    const futureAppointments = await Appointment.updateMany(
-      {
-        patientId: userId,
-        date: { $gte: new Date() },
-        status: { $in: ["PENDING", "CONFIRMED"] },
-      },
-      {
-        status: "CANCELLED",
-        cancellationReason: "Account deactivated",
-        cancelledAt: new Date(),
-        cancelledBy: userId,
-      },
-      { session }
-    );
-
-    // Soft delete all reviews by this patient
-    await Review.updateMany(
-      { patientId: userId },
-      {
-        isDeleted: true,
-        deletedAt: new Date()
-      },
-      { session }
-    );
-
-    // Soft delete all follows by this patient
-    await Follow.updateMany(
-      { patientId: userId },
-      {
-        isDeleted: true,
-        deletedAt: new Date()
-      },
-      { session }
-    );
-
-    console.log(`Patient ${user.email}: Cancelled ${futureAppointments.modifiedCount} future appointments.`);
-
-  }
+      console.log(
+        `Patient ${user.email}: Cancelled ${futureAppointments.modifiedCount} future appointments.`
+      );
+    }
 
     // Clear all sessions
 
-    await Session.deleteMany({ userId }, { session })
+    await Session.deleteMany({ userId }, { session });
 
     await session.commitTransaction();
 
@@ -261,9 +304,7 @@ const deleteAccount = asyncHandler(async (req, res) => {
           "Account deactivated successfully"
         )
       );
-
-
-   } catch (error) {
+  } catch (error) {
     // Abort transaction on error
     await session.abortTransaction();
 
@@ -276,13 +317,28 @@ const deleteAccount = asyncHandler(async (req, res) => {
   }
 );
 
+
 // Recover deleted account
 const recoverDeletedAccount = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
+  const { email, username, password } = req.body;
 
-  const user = await User.findById(userId).setOptions({ includeInactive: true });
+  if (!(email || username) || !password) {
+     throw new ApiError(400, "Email/Username and Password are required for recovery");
+  }
+
+  // Find user explicitly including inactive ones
+  const user = await User.findOne({
+    $or: [{ username }, { email }]
+  }).select("+password").setOptions({ includeInactive: true });
+
   if (!user) {
     throw new ApiError(404, "User not found");
+  }
+
+  // Verify password
+  const isPasswordValid = await user.isPasswordCorrect(password);
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid password");
   }
 
   if (user.accountStatus !== "PENDING_DELETION") {
@@ -309,7 +365,7 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
   // Restore role-specific data
   if (user.role === "DOCTOR") {
     // Restore doctor profile visibility
-    await Doctor.findOneAndUpdate({ doctorId: userId }, { isVisible: true,
+    await Doctor.findOneAndUpdate({ doctorId: user._id }, { isVisible: true,
     isAcceptingNewPatients: true 
   },
   {
@@ -320,7 +376,7 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
 // Restore Reviews
     await Review.updateMany(
       { 
-        doctorId: userId,
+        doctorId: user._id,
         isDeleted: true,
         deletedAt: { $gte: user.deletionScheduledAt}
       },
@@ -334,7 +390,7 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
     // Restore Follows
     await Follow.updateMany(
       {
-        doctorId: userId,
+        doctorId: user._id,
         isDeleted: true,
         deletedAt: { $gte: user.deletionScheduledAt }
       },
@@ -350,7 +406,7 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
 
     await Appointment.updateMany(
       {
-        doctorId: userId,
+        doctorId: user._id,
         status: "CANCELLED",
         cancelledAt: { $gte: twoDaysAgo },
         cancellationReason: "Account deactivated"
@@ -373,7 +429,7 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
     // Restore Reviews
     await Review.updateMany(
       {
-        patientId: userId,
+        patientId: user._id,
         isDeleted: true,
         deletedAt: { $gte: user.deletionScheduledAt }
       },
@@ -390,7 +446,7 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
     // Restore Follows
     await Follow.updateMany(
       {
-        patientId: userId,
+        patientId: user._id,
         isDeleted: true,
         deletedAt: { $gte: user.deletionScheduledAt }
       },
@@ -404,11 +460,11 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
     )
 
     // Restore Appointments within 2 Days of deletion date
-    const twoDaysAgo = new Date.UTC(Date.now() - 2 * 24 * 60 * 60 * 1000);
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
     await Appointment.updateMany(
       {
-        patientId: userId,
+        patientId: user._id,
         status: "CANCELLED",
         cancelledAt: { $gte: twoDaysAgo },
         cancellationReason: "Patient Account deactivated"
@@ -446,9 +502,6 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
     session.endSession();
   } 
 })
-
-
-
 
 
 
