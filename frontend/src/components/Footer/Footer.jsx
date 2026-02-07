@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 
 const Footer = () => {
-
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Main Footer Content */}
