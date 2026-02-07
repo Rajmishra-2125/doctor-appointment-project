@@ -16,29 +16,19 @@ const doctorSchema = new Schema(
     },
     specialization: {
       type: String,
-      required: [true, "Specialization is required"],
       index: true,
       trim: true,
     },
     qualification: {
       type: String,
-      required: [true, "At least one qualification is required"],
-      ValiDate: {
-        ValiDator: function (v) {
-          return v && v.length > 0;
-        },
-        message: "At least one qualification is required",
-      },
     },
     experience: {
       type: String,
-      required: [true, "Experience is required"],
       min: [0, "Experience cannot be negative"],
       max: [70, "Experience seems too high"],
     },
     consultationFee: {
       type: String,
-      required: [true, "Consultation fee is required"],
       min: [0, "Consultation fee cannot be negative"],
     },
     bio: {
@@ -50,8 +40,8 @@ const doctorSchema = new Schema(
     // Medical License Information
     licenseNumber: {
       type: String,
-      required: [true, "Medical license number is required"],
       unique: true,
+      sparse: true,
       trim: true,
     },
     licenseIssuingAuthority: {
@@ -80,17 +70,19 @@ const doctorSchema = new Schema(
     clinicPhone: {
       type: String,
       unique: true,
+      sparse: true,
       trim: true,
     },
     clinicEmail: {
       type: String,
       unique: true,
+      sparse: true,
       trim: true,
     },
 
     // Availability Information
     availableDays: {
-      type: [String], // ["MON", "TUE"]
+      type: [String],
       enum: [
         "MONDAY",
         "TUESDAY",
@@ -111,26 +103,26 @@ const doctorSchema = new Schema(
       ],
     },
     availableTimeSlots: {
-      type: [String], // ["09:00-10:00", "10:00-11:00"]
+      type: [String], 
       default: ["09:00 AM to 01:00 PM", "02:00 PM to 08:00 PM"],
     },
     workingHours: {
       start: {
-        type: String, // "09:00"
+        type: String, 
         default: "09:00 AM",
       },
       end: {
-        type: String, // "17:00"
+        type: String, 
         default: "08:00 PM",
       },
     },
     breakTime: {
       start: {
-        type: String, // "12:00"
+        type: String, 
         default: "01:00 PM",
       },
       end: {
-        type: String, // "13:00"
+        type: String,
         default: "02:00 PM",
       },
     },
@@ -209,20 +201,26 @@ doctorSchema.index({ isVisible: 1, isAcceptingNewPatients: 1 });
 
 
 // Middleware to exclude invisible doctors from queries by default
-doctorSchema.pre(/^find/, function (next) {
+doctorSchema.pre(/^find/, function () {
   if (!this.getOptions().includeInactive) {
     this.find({ isVisible: true });
   }
-  // next();
 });
 
 // Virtual for full clinic address
 doctorSchema.virtual("fullClinicAddress").get(function () {
-  if (!this.clinicAddress) return null;
-  
+  if (!this.clinicAddress) return "Address not Provided";
+
   const { street, city, state, zipCode, country } = this.clinicAddress;
 
-  return `${street}, ${city}, ${state} - ${zipCode}, ${country}`;
+  // Filter out undefined, null, or empty strings
+  const addressParts = [street, city, state, zipCode, country].filter(Boolean);
+
+  if (addressParts.length === 0) {
+    return "Address not provided";
+  }
+
+  return addressParts.join(", ");
 });
 
 // Instance method to check availability on a specific day
@@ -251,6 +249,54 @@ doctorSchema.methods.updateRating = async function () {
 
   await this.save();
 }
+
+
+
+// Instance method to update all doctor statistics (Rating + Appointment Counts)
+doctorSchema.methods.updateDoctorStats = async function () {
+  const Appointment = mongoose.model("Appointment");
+  const Review = mongoose.model("Review");
+  const doctorId = this._id;
+
+  // 1. Calculate Appointment Stats
+  const appointmentStats = await Appointment.aggregate([
+    { $match: { doctorId: doctorId } },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: 1 },
+        cancelled: { $sum: { $cond: [{ $eq: ["$status", "CANCELLED"] }, 1, 0] } },
+        completed: { $sum: { $cond: [{ $eq: ["$status", "COMPLETED"] }, 1, 0] } }
+      }
+    }
+  ]);
+
+  const stats = appointmentStats[0] || { total: 0, cancelled: 0, completed: 0 };
+
+  // 2. Calculate Review Stats
+  const reviewStats = await Review.aggregate([
+     { $match: { doctorId: doctorId, isApproved: true, isDeleted: false } },
+     {
+       $group: {
+         _id: null,
+         averageRating: { $avg: "$rating" },
+         count: { $sum: 1 }
+       }
+     }
+  ]);
+
+  const rStats = reviewStats[0] || { averageRating: 0, count: 0 };
+
+  // 3. Update Fields
+  this.totalAppointments = stats.total;
+  this.canceledAppointments = stats.cancelled; // naming convention in schema is canceled (one 'l')
+  this.completedAppointments = stats.completed;
+  this.rating = rStats.averageRating > 0 ? rStats.averageRating.toFixed(1) : 0;
+  this.reviewCount = rStats.count;
+
+  await this.save();
+}
+
 
 
 export const Doctor = mongoose.model("Doctor", doctorSchema);
