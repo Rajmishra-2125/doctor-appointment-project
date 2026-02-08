@@ -377,7 +377,7 @@ Otherwise, continue the conversation naturally to gather information.`;
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
-      <div className="bg-linear-to-r from-blue-600 to-indigo-700 dark:from-blue-900 dark:to-indigo-900 text-white py-16 transition-colors duration-200">
+      <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white py-16 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-4">
             <Link

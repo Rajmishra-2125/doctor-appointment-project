@@ -384,7 +384,7 @@ function Doctors() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Header Banner */}
-      <div className="bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-16 transition-colors duration-200">
+      <div className="bg-linear-to-br from-blue-600 to-indigo-700  text-white py-16 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Find Your Doctor

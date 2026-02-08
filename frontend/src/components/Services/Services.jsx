@@ -388,7 +388,7 @@ function Services() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Hero Section */}
-      <section className="relative bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 text-white py-20 transition-colors duration-200">
+      <section className="rrelative bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-20 transition-colors duration-200">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
