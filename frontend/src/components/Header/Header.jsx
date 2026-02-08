@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -19,10 +19,17 @@ function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [imageError, setImageError] = useState(false)
+
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+
+
+  useEffect(() => {
+    setImageError(false);
+  }, [user?.profileImage]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -75,11 +82,21 @@ function Header() {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center space-x-2 text-white hover:text-orange-500 focus:outline-none"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white">
+                  <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white overflow-hidden">
+                    {user.profileImage && !imageError ? (
+                      <img
+                        src={user.profileImage}
+                        alt={user.fullname}
+                        className="w-full h-full object-cover"
+                        onError={() => setImageError(true)}
+                      />
+                    ) : (
+                      <User className="w-5 h-5" />
+                    )}
                     <User className="w-5 h-5" />
                   </div>
                   <span className="hidden md:block font-medium">
-                    {user.name}
+                    {/* {user.fullname} */}
                   </span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
@@ -89,7 +106,7 @@ function Header() {
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 border border-gray-100 dark:border-gray-700 z-50 animate-fade-in-down">
                     <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">
                       <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">
-                        {user?.name}
+                        {user?.fullname}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                         {user?.email}
@@ -102,7 +119,7 @@ function Header() {
                       onClick={() => setIsDropdownOpen(false)}
                     >
                       <User className="h-4 w-4" />
-                      Your Profile
+                      Profile
                     </Link>
 
                     <Link
