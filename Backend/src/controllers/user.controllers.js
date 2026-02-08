@@ -26,14 +26,45 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { userDetails }, "current user details"));
 });
 
-// Update account details
-const updateAccountDetails = asyncHandler(async (req, res) => {
+// const update Personal details
+
+const updateProfileDetails = asyncHandler(async (req, res) => {
   const {
     fullname,
+    username,
     email,
     phone,
     gender,
-    dateOfBirth,
+    dateOfBirth
+  } = req.body;
+
+  const updateData = {
+    fullname,
+    username,
+    email,
+    phone,
+    gender,
+    dateOfBirth
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: updateData,
+    },
+    {
+      new: true,
+    }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Profile updated successfully."));
+})
+
+// Update account details
+const updateAddressDetails = asyncHandler(async (req, res) => {
+  const {
     street,
     city,
     state,
@@ -41,17 +72,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     country,
   } = req.body;
 
-  if (!fullname || !email) {
-    throw new ApiError(401, "Fullname and Email are required");
-  }
-
   // Construct update object
   const updateData = {
-    fullname,
-    email,
-    phone,
-    gender,
-    dateOfBirth,
     address: {
       street,
       city,
@@ -503,7 +525,8 @@ const recoverDeletedAccount = asyncHandler(async (req, res) => {
 
 export {
   getCurrentUser,
-  updateAccountDetails,
+  updateProfileDetails,
+  updateAddressDetails,
   updateUserAvatar,
   changeCurrentPassword,
   deleteAccount,
