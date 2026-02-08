@@ -7,6 +7,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MediCare | Doctor-Appointments </title>
   </head>
+  <script>
+    (function () {
+      const theme = localStorage.getItem("theme");
+      const root = window.document.documentElement;
+      
+      const applyTheme = (newTheme) => {
+        root.classList.remove("dark", "light");
+        if (newTheme === "dark") {
+          root.classList.add("dark");
+        } else if (newTheme === "light") {
+          root.classList.add("light");
+        } else {
+          // System preference
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            root.classList.add("dark");
+          } else {
+             root.classList.add("light");
+          }
+        }
+      };
+
+      applyTheme(theme || "system");
+    })();
+  </script>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
