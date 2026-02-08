@@ -36,8 +36,20 @@ const logout = async () => {
 };
 
 // Update user details
-const updateUser = async (userData) => {
-  const response = await api.patch('/users/update-account', userData);
+const updateAccountDetails = async (userData) => {
+  const response = await api.patch("/users/update-account-details", userData);
+
+  if(response.data) {
+     const currentUser = JSON.parse(localStorage.getItem("user"));
+     const updatedUser = { ...currentUser, ...response.data.data };
+     localStorage.setItem("user", JSON.stringify(updatedUser));
+  }
+  return response.data.data;
+}
+
+// Updating account address
+const updateAddressDetails = async (userData) => {
+  const response = await api.patch("/users/update-account-address", userData);
 
   if (response.data) {
     // Ideally update local storage user if necessary, or rely on fetching current-user
@@ -95,7 +107,8 @@ const authService = {
   register,
   logout,
   login,
-  updateUser,
+  updateAccountDetails,
+  updateAddressDetails,
   updateAvatar,
   changePassword,
   deleteAccount,
