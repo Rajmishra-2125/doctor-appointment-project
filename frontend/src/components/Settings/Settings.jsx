@@ -32,8 +32,6 @@ const Settings = () => {
         marketing: false
     });
 
-    const [darkMode, setDarkMode] = useState(false);
-
     // Password Change State
     const [passwordData, setPasswordData] = useState({
         oldPassword: '',

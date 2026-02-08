@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  ClipboardList,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, reset } from "../../features/auth/authSlice";
@@ -19,13 +20,63 @@ function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [imageError, setImageError] = useState(false)
+  const [imageError, setImageError] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
+  // Initial Mock Notifications moved from Panel
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: "Welcome to MediCare!",
+      message: "Thanks for joining our platform. Start by finding a doctor.",
+      time: "2 hours ago",
+      isRead: false,
+    },
+    {
+      id: 2,
+      title: "Profile Update",
+      message: "Your profile was successfully updated.",
+      time: "1 day ago",
+      isRead: true,
+    },
+    {
+      id: 3,
+      title: "Appointment Reminder",
+      message: "Don't forget to book your annual checkup.",
+      time: "3 days ago",
+      isRead: true,
+    },
+  ]);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
+  };
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY) {
+        setIsVisible(false); // Scrolling down
+      } else {
+        setIsVisible(true); // Scrolling up
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
 
   useEffect(() => {
     setImageError(false);
@@ -48,8 +99,10 @@ function Header() {
   };
 
   return (
-    <header className="shadow sticky z-50 top-0">
-      <nav className="bg-gray-900 shadow-md border-gray-200 px-4 lg:px-6 py-2.5">
+    <header
+      className={`shadow sticky z-50 top-0 transition-transform duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
+    >
+      <nav className="bg-gray-950 shadow-md border-gray-50 rounded-2xl px-4 lg:px-6 py-2.5">
         <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen">
           <Link to="/" className="flex items-center">
             <img
@@ -72,7 +125,9 @@ function Header() {
               >
                 <Bell className="w-6 h-6" />
                 {/* Mock Badge */}
-                <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-gray-900"></span>
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-gray-900"></span>
+                )}
               </button>
             )}
 
@@ -93,7 +148,6 @@ function Header() {
                     ) : (
                       <User className="w-5 h-5" />
                     )}
-                    <User className="w-5 h-5" />
                   </div>
                   <span className="hidden md:block font-medium">
                     {/* {user.fullname} */}
@@ -108,9 +162,6 @@ function Header() {
                       <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">
                         {user?.fullname}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {user?.email}
-                      </p>
                     </div>
 
                     <Link
@@ -120,6 +171,15 @@ function Header() {
                     >
                       <User className="h-4 w-4" />
                       Profile
+                    </Link>
+
+                    <Link
+                      to="/my-appointments"
+                      className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <ClipboardList className="h-4 w-4" />
+                      My Appointments
                     </Link>
 
                     <Link
@@ -245,12 +305,6 @@ function Header() {
         </div>
       </nav>
 
-      {/* Notification Panel */}
-      <NotificationPanel
-        isOpen={isNotificationsOpen}
-        onClose={() => setIsNotificationsOpen(false)}
-      />
-
       {/* Mobile Menu */}
       <div
         className={`${
@@ -339,18 +393,6 @@ function Header() {
             </NavLink>
           </li>
         </ul>
-
-        {/* Mobile Search Bar */}
-        <div className="p-4">
-          <div className="relative">
-            <input
-              type="text"
-              className="block w-full pl-10 pr-4 py-2 text-white bg-gray-700 rounded-lg border border-gray-600 hover:border-indigo-500 focus:border-indigo-500 focus:outline-none sm:text-sm placeholder-gray-400"
-              placeholder="Search Doctors..."
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          </div>
-        </div>
       </div>
     </header>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateProfile } from '../../features/auth/authSlice';
+import { updateProfileAddress } from '../../features/auth/authSlice';
 import { X, MapPin, Save, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -82,7 +82,7 @@ const CompleteProfileModal = () => {
                 dateOfBirth: user.dateOfBirth
             };
 
-            await dispatch(updateProfile(payload)).unwrap();
+            await dispatch(updateProfileAddress(payload)).unwrap();
             toast.success("Profile updated successfully!");
             setIsOpen(false);
         } catch (error) {
