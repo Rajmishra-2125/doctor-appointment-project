@@ -1,7 +1,8 @@
 import { Router } from "express";
 import {
   getCurrentUser,
-  updateAccountDetails,
+  updateProfileDetails,
+  updateAddressDetails,
   updateUserAvatar,
   changeCurrentPassword,
   deleteAccount,
@@ -18,7 +19,8 @@ const router = Router();
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 
 // Update account details
-router.route("/update-account").patch(verifyJWT, updateAccountDetails);
+router.route("/update-account-details").patch(verifyJWT, updateProfileDetails);
+router.route("/update-account-address").patch(verifyJWT, updateAddressDetails);
 
 // Update user avatar
 router
