@@ -49,12 +49,12 @@ export const logout = createAsyncThunk("auth/logout", async () => {
   await authService.logout();
 });
 
-// Update user profile
-export const updateProfile = createAsyncThunk(
-  "auth/updateProfile",
+// Update user Address
+export const updateProfileAddress = createAsyncThunk(
+  "user/updateAddress",
   async (userData, thunkAPI) => {
     try {
-      return await authService.updateUser(userData);
+      return await authService.updateAddressDetails(userData);
     } catch (error) {
       const message =
         (error.response &&
@@ -67,9 +67,27 @@ export const updateProfile = createAsyncThunk(
   },
 );
 
+// Update user profile details
+export const updateUserPersonalDetails = createAsyncThunk(
+  "user/updateProfileDetails",
+  async (userData, thunkAPI) => {
+    try {
+      return await authService.updateAccountDetails(userData);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+)
+
 // Update user avatar
 export const updateUserAvatar = createAsyncThunk(
-  "auth/updateUserAvatar",
+  "user/updateUserAvatar",
   async (formData, thunkAPI) => {
     try {
       return await authService.updateAvatar(formData);
@@ -87,7 +105,7 @@ export const updateUserAvatar = createAsyncThunk(
 
 // Change password
 export const changePassword = createAsyncThunk(
-  "auth/changePassword",
+  "user/changePassword",
   async (userData, thunkAPI) => {
     try {
       return await authService.changePassword(userData);
@@ -123,7 +141,7 @@ export const recoverAccount = createAsyncThunk(
 
 // Delete account
 export const deleteAccount = createAsyncThunk(
-  "auth/deleteAccount",
+  "user/deleteAccount",
   async (data, thunkAPI) => {
     try {
       return await authService.deleteAccount(data);
@@ -188,16 +206,32 @@ export const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
       })
-      .addCase(updateProfile.pending, (state) => {
+
+      .addCase(updateUserPersonalDetails.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(updateProfile.fulfilled, (state, action) => {
+      .addCase(updateUserPersonalDetails.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.user = action.payload;
         state.message = "Profile updated successfully";
       })
-      .addCase(updateProfile.rejected, (state, action) => {
+      .addCase(updateUserPersonalDetails.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+
+      .addCase(updateProfileAddress.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateProfileAddress.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.user = action.payload;
+        state.message = "Address updated successfully";
+      })
+      .addCase(updateProfileAddress.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
