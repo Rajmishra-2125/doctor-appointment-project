@@ -386,9 +386,9 @@ function Services() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Hero Section */}
-      <section className="relative bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-20">
+      <section className="relative bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 text-white py-20 transition-colors duration-200">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
@@ -401,7 +401,7 @@ function Services() {
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               World-Class Medical Services
             </h1>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-blue-100 dark:text-blue-200 mb-8">
               From routine checkups to advanced treatments, we provide
               comprehensive healthcare services using the latest medical
               technology
@@ -427,18 +427,18 @@ function Services() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-100 rounded-full mb-3">
-                  <stat.icon className="w-7 h-7 text-blue-600" />
+                <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-100 dark:bg-blue-900/40 rounded-full mb-3">
+                  <stat.icon className="w-7 h-7 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-3xl font-bold text-gray-900 mb-1">
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
                   {stat.number}
                 </p>
-                <p className="text-gray-600">{stat.label}</p>
+                <p className="text-gray-600 dark:text-gray-400">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -447,13 +447,17 @@ function Services() {
 
       {/* Category Filter */}
       <section
-        className="py-8 bg-gray-50 sticky top-0 z-40 border-b bg-white-50 backdrop-blur-sm"
+        className="py-8 sticky top-0 z-40 border-b border-gray-100 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md transition-colors duration-200"
         id="services"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">Our Services</h2>
-            <p className="text-gray-600">{filteredServices.length} services</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Our Services
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              {filteredServices.length} services
+            </p>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map((category) => (
@@ -463,7 +467,7 @@ function Services() {
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${
                   selectedCategory === category.name
                     ? "bg-blue-600 text-white shadow-lg scale-105"
-                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
                 }`}
               >
                 <category.icon className="w-5 h-5" />
@@ -475,13 +479,13 @@ function Services() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-12">
+      <section className="py-12 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredServices.map((service) => (
               <div
                 key={service.id}
-                className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-transparent dark:border-gray-700"
               >
                 {/* Service Header */}
                 <div
@@ -501,18 +505,18 @@ function Services() {
                 <div className="p-6">
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <Clock className="w-4 h-4" />
                         <span className="text-sm">{service.duration}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <DollarSign className="w-4 h-4" />
                         <span className="text-sm font-semibold">
                           {service.price}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600 mb-4">
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-4">
                       <Calendar className="w-4 h-4" />
                       <span className="text-sm">{service.availability}</span>
                     </div>
@@ -526,7 +530,7 @@ function Services() {
                           expandedService === service.id ? null : service.id,
                         )
                       }
-                      className="flex items-center justify-between w-full text-left font-semibold text-gray-900 mb-3"
+                      className="flex items-center justify-between w-full text-left font-semibold text-gray-900 dark:text-white mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       <span>Key Features</span>
                       <ChevronRight
@@ -536,13 +540,13 @@ function Services() {
 
                     {expandedService === service.id && (
                       <div className="space-y-2 animate-in slide-in-from-top">
-                        <p className="text-sm text-gray-700 mb-3">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
                           {service.fullDescription}
                         </p>
                         {service.features.map((feature, idx) => (
                           <div key={idx} className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                            <span className="text-sm text-gray-700">
+                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
                               {feature}
                             </span>
                           </div>
@@ -555,11 +559,11 @@ function Services() {
                   <div className="flex gap-3">
                     <Link
                       to="/doctors/appointments"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-center transition-colors"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-center transition-colors shadow-lg hover:shadow-blue-500/30"
                     >
                       Book Now
                     </Link>
-                    <button className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-colors">
+                    <button className="px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold transition-colors">
                       <Phone className="w-5 h-5" />
                     </button>
                   </div>
@@ -571,13 +575,13 @@ function Services() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-20 bg-linear-to-br from-blue-50 to-indigo-50">
+      <section className="py-20 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-indigo-950/20 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Why Choose Our Services?
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               We combine cutting-edge technology with compassionate care to
               deliver exceptional healthcare services
             </p>
@@ -587,15 +591,17 @@ function Services() {
             {whyChooseUs.map((item, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl p-8 hover:shadow-lg transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-xl p-8 hover:shadow-lg transition-all duration-200 border border-transparent dark:border-gray-700"
               >
-                <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-100 rounded-xl mb-4">
-                  <item.icon className="w-7 h-7 text-blue-600" />
+                <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-100 dark:bg-blue-900/40 rounded-xl mb-4">
+                  <item.icon className="w-7 h-7 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                   {item.title}
                 </h3>
-                <p className="text-gray-600">{item.description}</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {item.description}
+                </p>
               </div>
             ))}
           </div>
@@ -603,54 +609,54 @@ function Services() {
       </section>
 
       {/* Insurance & Payment */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-900 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
                 Insurance & Payment Options
               </h2>
-              <p className="text-xl text-gray-600 mb-8">
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
                 We accept most major insurance plans and offer flexible payment
                 options to make quality healthcare accessible to everyone.
               </p>
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-start gap-4">
-                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
+                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-green-100 dark:bg-green-900/40 rounded-lg">
+                    <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-1">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-1">
                       Most Insurance Accepted
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       We work with all major insurance providers
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
-                    <DollarSign className="w-6 h-6 text-blue-600" />
+                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+                    <DollarSign className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-1">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-1">
                       Flexible Payment Plans
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       Interest-free payment options available
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
-                    <Shield className="w-6 h-6 text-purple-600" />
+                  <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
+                    <Shield className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-1">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-1">
                       Transparent Pricing
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       No hidden fees or surprise charges
                     </p>
                   </div>
@@ -659,15 +665,15 @@ function Services() {
 
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-colors"
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-blue-500/30"
               >
                 Contact Billing
                 <ChevronRight className="w-5 h-5" />
               </Link>
             </div>
 
-            <div className="bg-linear-to-br from-blue-100 to-indigo-100 rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="bg-linear-to-br from-blue-100 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-8 border border-transparent dark:border-gray-700">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 Accepted Insurance Providers
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -683,13 +689,13 @@ function Services() {
                 ].map((provider, idx) => (
                   <div
                     key={idx}
-                    className="bg-white rounded-lg p-4 text-center font-semibold text-gray-700"
+                    className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center font-semibold text-gray-700 dark:text-gray-300 shadow-sm"
                   >
                     {provider}
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-gray-600 mt-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-6">
                 Don't see your insurance? Contact us to verify coverage.
               </p>
             </div>
@@ -698,19 +704,19 @@ function Services() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-linear-to-r from-blue-600 to-indigo-700 text-white">
+      <section className="py-20 bg-linear-to-r from-blue-600 to-indigo-700 dark:from-blue-900 dark:to-indigo-900 text-white transition-colors duration-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">
             Ready to Experience Better Healthcare?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-blue-100 dark:text-blue-200 mb-8">
             Book an appointment today and take the first step towards better
             health
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/doctors/appointments"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 dark:text-blue-800 px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105"
             >
               <Calendar className="w-5 h-5" />
               Book Appointment
@@ -727,21 +733,21 @@ function Services() {
       </section>
 
       {/* Emergency Contact */}
-      <section className="py-8 bg-red-600 text-white">
+      <section className="py-8 bg-red-600 dark:bg-red-800 text-white transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Ambulance className="w-10 h-10" />
               <div>
                 <h3 className="text-xl font-bold">24/7 Emergency Services</h3>
-                <p className="text-red-100">
+                <p className="text-red-100 dark:text-red-200">
                   Immediate medical attention when you need it most
                 </p>
               </div>
             </div>
             <a
               href="tel:911"
-              className="bg-white text-red-600 px-8 py-3 rounded-lg font-bold text-lg hover:bg-red-50 transition-colors"
+              className="bg-white text-red-600 dark:text-red-800 px-8 py-3 rounded-lg font-bold text-lg hover:bg-red-50 transition-colors"
             >
               Call 911
             </a>

@@ -10,7 +10,6 @@ import {
   Eye,
 } from "lucide-react";
 
-
 function About() {
   const stats = [
     { icon: Users, value: "50,000+", label: "Happy Patients" },
