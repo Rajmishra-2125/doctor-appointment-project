@@ -25,6 +25,7 @@ import Profile from "./components/Users/Profile.jsx";
 import ProtectedRoute from "./components/Auth/ProtectedRoute.jsx"; // Import ProtectedRoute
 import Settings from "./components/Settings/Settings.jsx";
 import RecoverAccount from "./components/Auth/RecoverAccount.jsx";
+import MyAppointments from "./components/Appointments/MyAppointments.jsx"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -44,6 +45,7 @@ const router = createBrowserRouter(
       <Route element={<ProtectedRoute />}>
         <Route path="profile" element={<Profile />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="my-appointments" element={<MyAppointments/>} />
         {/* Add other protected routes here */}
       </Route>
     </Route>,
