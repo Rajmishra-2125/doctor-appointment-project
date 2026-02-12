@@ -83,7 +83,7 @@ export const updateUserPersonalDetails = createAsyncThunk(
       return thunkAPI.rejectWithValue(message);
     }
   },
-)
+);
 
 // Update user avatar
 export const updateUserAvatar = createAsyncThunk(

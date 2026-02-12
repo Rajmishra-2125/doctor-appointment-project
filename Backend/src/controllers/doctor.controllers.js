@@ -5,115 +5,20 @@ import { User } from "../models/user.models.js";
 import { Doctor } from "../models/doctor.models.js";
 import { Follow } from "../models/follow.models.js";
 
-const saveDoctorInfo = asyncHandler(async (req, res) => {
-  const {
-    specialization,
-    qualification,
-    experience,
-    consultationFee,
-    licenseNumber,
-    licenseIssuingAuthority,
-    licenseIssueDate,
-    licenseExpiryDate,
-    clinicName,
-    clinicPhone,
-    clinicEmail,
-  } = req.body;
+const getDoctorDetails = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
 
-  if (
-    !specialization ||
-    !qualification ||
-    !experience ||
-    !consultationFee ||
-    !licenseNumber
-  ) {
-    throw new ApiError(400, "All fields are required");
+  if (!userId) {
+    throw new ApiError(400, "user not found");
   }
+  const userDetails = await Doctor.findById(userId).select(
+    "-password -refreshToken"
+  );
 
-  const clinicDetailCheck = await Doctor.findOne({
-    $or: [
-      { clinicEmail: clinicEmail },
-      { clinicPhone: clinicPhone },
-      { licenseNumber: licenseNumber },
-    ],
-  });
-
-  if (clinicDetailCheck) {
-    throw new ApiError(
-      401,
-      "Doctor with this licenseNumber or email or phoneNumber already exists"
-    );
-  }
-
-  const existedUser = await User.findOne({
-    _id: req.user?._id,
-    role: "DOCTOR",
-  });
-
-  console.log("existedUser", existedUser);
-  console.log("existedUser?._id", existedUser?._id);
-
-  if (existedUser.role !== "DOCTOR") {
-    throw new ApiError(403, "Only doctors can create profile");
-  }
-
-  const existingDoctor = await Doctor.findOne({
-    doctorId: req.user?._id,
-  }).setOptions({ includeInactive: true });
-
-  if (existingDoctor) {
-    throw new ApiError(
-      401,
-      "doctor account already updated for any changes use update profile"
-    );
-  }
-
-  const address = existedUser.address;
-
-  try {
-    const doctorInfo = await Doctor.findOneAndUpdate(
-      { doctorId: req.user?._id },
-      {
-        doctorId: req.user?._id,
-        doctor: req.user?.username,
-        specialization: specialization,
-        qualification: qualification,
-        experience: experience,
-        licenseNumber: licenseNumber,
-        licenseIssuingAuthority: licenseIssuingAuthority,
-        licenseIssueDate: licenseIssueDate,
-        licenseExpiryDate: licenseExpiryDate,
-        consultationFee: consultationFee,
-        clinicName: clinicName,
-        clinicPhone: clinicPhone,
-        clinicEmail: clinicEmail,
-        clinicAddress: address,
-      },
-      {
-        upsert: true,
-        new: true,
-      }
-    ).setOptions({ includeInactive: true });
-
-    console.log(doctorInfo, "doctorInfo");
-
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          { data: doctorInfo },
-          "Doctor profile created successfully"
-        )
-      );
-  } catch (error) {
-    throw new ApiError(
-      404,
-      error.message,
-      "Something went wrong while saving doctor info"
-    );
-  }
-});
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { userDetails }, "current user details"));
+})
 
 const getDoctors = asyncHandler(async (req, res) => {
   const doctors = await Doctor.aggregate([]).limit(20);
@@ -136,36 +41,26 @@ const updateDoctorProfile = asyncHandler(async (req, res) => {
     isAcceptingNewPatients,
   } = req.body;
 
-  if (
-    !specialization ||
-    !qualification ||
-    !experience ||
-    !consultationFee ||
-    !clinicName
-  ) {
-    throw new ApiError(401, "invalid credentials");
+  const doctorData = {
+    specialization,
+    qualification,
+    experience,
+    consultationFee,
+    clinicName,
+    isVisible,
+    isAcceptingNewPatients
   }
 
   const updateDoctorInfo = await Doctor.findOneAndUpdate(
     { doctorId: req.user?._id },
     {
-      specialization: specialization,
-      qualification: qualification,
-      experience: experience,
-      consultationFee: consultationFee,
-      clinicName: clinicName,
-      isVisible: isVisible,
-      isAcceptingNewPatients: isAcceptingNewPatients,
+      $set: doctorData
     },
     {
       upsert: true,
       new: true,
     }
   ).setOptions({ includeInactive: true });
-
-  if (!updateDoctorInfo) {
-    throw new ApiError(401, "Doctor not found");
-  }
 
   return res
     .status(200)
@@ -386,8 +281,8 @@ const getAvailability = asyncHandler(async (req, res) => {
 });
 
 export {
+  getDoctorDetails,
   getDoctors,
-  saveDoctorInfo,
   updateDoctorProfile,
   followDoctor,
   unfollowDoctor,

@@ -1,6 +1,9 @@
 # Environment variables
 .env
 
+# generated_slots file
+generated_slots
+
 # Node
 node_modules/
 

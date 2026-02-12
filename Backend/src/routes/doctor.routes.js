@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
+  getDoctorDetails,
   getDoctors,
-  saveDoctorInfo,
   updateDoctorProfile,
   followDoctor,
   unfollowDoctor,
@@ -20,14 +20,15 @@ const router = Router();
  * =========================
  */
 
-// Saving info in doctor profile
-router.route("/saveInfo").post(verifyJWT, saveDoctorInfo);
+// Geting my doctor details
+router.route("/my-details").get(verifyJWT, getDoctorDetails);
+
 
 // Update doctor profile
 router.route("/updateInfo").patch(verifyJWT, updateDoctorProfile);
 
 // Geting normal doctors list
-router.route("/profiles").get(verifyJWT, getDoctors);
+router.route("/getDoctorprofiles").get(verifyJWT, getDoctors);
 
 // follow the doctor profile
 router.route("/:username/follow").post(verifyJWT, followDoctor);
