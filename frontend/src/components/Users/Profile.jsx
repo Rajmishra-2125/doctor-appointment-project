@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { reset } from "../../features/auth/authSlice";
 import {
+  reset,
   updateUserPersonalDetails,
   updateProfileAddress,
   updateUserAvatar,
-} from "../../features/users/UserSlice";
+} from "../../features/auth/authSlice";
 import { Camera, User, Mail, Phone, MapPin, Calendar, Save, X, Edit2 } from "lucide-react";
 import toast from "react-hot-toast";
 import Spinner from "../shared/Spinner";

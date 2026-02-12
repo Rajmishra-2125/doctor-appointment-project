@@ -13,8 +13,11 @@ import {
     Globe
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout, deleteAccount } from '../../features/auth/authSlice';
-import { changePassword } from '../../features/users/UserSlice';
+import {
+  logout,
+  deleteAccount,
+  changePassword,
+} from "../../features/auth/authSlice";
 import toast from 'react-hot-toast';
 
 import { useTheme } from '../../context/ThemeContext';
