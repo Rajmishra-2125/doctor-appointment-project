@@ -155,14 +155,14 @@ const ManageAppointment = () => {
 
   if (isLoading && !appointments?.length) {
     return (
-      <div className="flex h-[600px] items-center justify-center">
+      <div className="flex h-150 items-center justify-center">
         <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto animate-fade-in pb-10 relative">
+    <div className="space-y-6 max-w-400 mx-auto animate-fade-in pb-10 relative">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
