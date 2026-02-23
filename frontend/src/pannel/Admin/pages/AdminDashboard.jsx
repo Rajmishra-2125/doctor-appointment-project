@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getDashboardStats } from "../../../features/admin/adminSlice";
+import { getDashboardStats } from '../../../features/admin/AdminSlice'
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-[600px] items-center justify-center">
+      <div className="flex h-150 items-center justify-center">
         <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
       </div>
     );
@@ -119,7 +119,7 @@ const AdminDashboard = () => {
 
   if (isError) {
     return (
-      <div className="flex h-[600px] flex-col items-center justify-center gap-4 text-center">
+      <div className="flex h-150 flex-col items-center justify-center gap-4 text-center">
         <div className="p-4 bg-red-50 dark:bg-red-900/10 rounded-full">
           <AlertCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
         </div>
@@ -138,7 +138,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto animate-fade-in">
+    <div className="space-y-6 max-w-400 mx-auto animate-fade-in">
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {statCards.map((stat, index) => (
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
             ))}
           </div>
         </div>
-        <div className="p-6 h-[350px] w-full relative">
+        <div className="p-6 h-87.5 w-full relative" >
           {isChartLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-[1px]">
               <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
