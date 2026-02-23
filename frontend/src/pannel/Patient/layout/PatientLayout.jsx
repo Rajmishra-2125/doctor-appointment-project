@@ -1,11 +1,16 @@
-import React from 'react'
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer";
 
-function PatientLayout() {
+function Layout({ children }) {
   return (
-    <div>
-      
-    </div>
-  )
+    <>
+      <Header />
+      {children || <Outlet />}
+      <Footer />
+    </>
+  );
 }
 
-export default PatientLayout;
+export default Layout;
