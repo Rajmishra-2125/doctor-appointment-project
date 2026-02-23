@@ -11,6 +11,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
+import Services from './components/Services/Services.jsx'
 import About from "./components/About/About.jsx";
 import Contact from "./components/Contacts/Contact.jsx";
 import Home from "./components/Home/Home.jsx";
@@ -51,6 +52,7 @@ const router = createBrowserRouter(
       <Route path="recover-account" element={<RecoverAccount />} />
       <Route path="doctors" element={<Doctors />} />
       <Route path="appointments" element={<Appointments />} />
+      <Route path="services" element={<Services />} />
 
       {/* Admin Panel Routes */}
       <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
