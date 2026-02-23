@@ -5,7 +5,7 @@ import Footer from './components/Footer/Footer';
 import Sidebar from './components/Sidebar/Sidebar';
 
 
-function AdminLayout() {
+function AdminLayout({Children}) {
 
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
       try {
