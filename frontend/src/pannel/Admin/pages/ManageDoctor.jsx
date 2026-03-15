@@ -157,14 +157,14 @@ const ManageDoctor = () => {
 
   if (isLoading && !doctors?.length) {
     return (
-      <div className="flex h-[600px] items-center justify-center">
+      <div className="flex h-150 items-center justify-center">
         <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto animate-fade-in pb-10">
+    <div className="space-y-6 max-w-400 mx-auto animate-fade-in pb-10">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -334,7 +334,7 @@ const ManageDoctor = () => {
         {approvedDoctors.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {approvedDoctors.map((doc) => (
-              <div key={doc._id} className="bg-white dark:bg-slate-900 rounded-[24px] border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all group overflow-hidden relative">
+              <div key={doc._id} className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all group overflow-hidden relative">
                 {/* Visual Accent */}
                 <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-600/5 rounded-bl-[100px] -mr-8 -mt-8 group-hover:bg-indigo-600/10 transition-colors" />
                 
@@ -495,7 +495,7 @@ const ManageDoctor = () => {
       {/* Modal: Detail View */}
       {showDetailModal && selectedDoctor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-           <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden relative border border-gray-100 dark:border-slate-800 animate-in slide-in-from-bottom-5 duration-300">
+           <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-4xl shadow-2xl overflow-hidden relative border border-gray-100 dark:border-slate-800 animate-in slide-in-from-bottom-5 duration-300">
               {/* Profile Background */}
               <div className={`h-32 bg-linear-to-r from-indigo-500 to-purple-600 dark:opacity-80`} />
               
@@ -548,7 +548,7 @@ const ManageDoctor = () => {
                           <div className="p-2 rounded-lg bg-gray-50 dark:bg-slate-800"><MapPin className="w-4 h-4 text-gray-500" /></div>
                           <div>
                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-tighter">Clinic</p>
-                             <p className="text-sm font-bold text-gray-700 dark:text-slate-200 truncate max-w-[140px]">{selectedDoctor.clinicName || "Private"}</p>
+                             <p className="text-sm font-bold text-gray-700 dark:text-slate-200 truncate max-w-35">{selectedDoctor.clinicName || "Private"}</p>
                           </div>
                        </div>
                        <div className="flex items-center gap-3">
