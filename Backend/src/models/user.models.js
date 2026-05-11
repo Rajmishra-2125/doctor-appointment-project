@@ -1,6 +1,6 @@
-import mongoose, { Schema } from 'mongoose';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userSchema = new Schema(
   {
@@ -11,12 +11,10 @@ const userSchema = new Schema(
       minlength: [2, "Full name must be at least 2 characters long"],
       maxlength: [50, "Full name must be at most 50 characters long"],
     },
-    username: {
+    patientId: {
       type: String,
-      required: true,
       unique: true,
-      lowercase: true,
-      trim: true,
+      sparse: true, // allow null values for Doctor and Admin
       index: true,
     },
     email: {
@@ -25,20 +23,36 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Please provide a valid email address"],
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        "Please provide a valid email address",
+      ],
       index: true,
     },
     password: {
       type: String,
-      required: [true, "password is required"],
+      required: function () {
+        return this.authProvider === "LOCAL";
+      },
       minlength: [6, "Password must be at least 6 characters long"],
       select: false, // important for security
+    },
+    authProvider: {
+      type: String,
+      enum: ["LOCAL", "GOOGLE"],
+      default: "LOCAL",
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
     role: {
       type: String,
       enum: ["PATIENT", "DOCTOR", "ADMIN"],
       default: "PATIENT",
       required: true,
+      index: true,
     },
     profileImage: {
       type: String, // cloudinary URL
@@ -46,7 +60,9 @@ const userSchema = new Schema(
     },
     phone: {
       type: String,
-      required: true,
+      required: function () {
+        return this.authProvider === "LOCAL";
+      },
       trim: true,
       match: [/^\+?[1-9]\d{1,14}$/, "Please provide a valid phone number"],
     },
@@ -55,7 +71,7 @@ const userSchema = new Schema(
     },
     gender: {
       type: String,
-      enum: ["MALE", "FEMALE", "OTHER"],  
+      enum: ["MALE", "FEMALE", "OTHER"],
     },
     address: {
       street: String,
@@ -64,7 +80,7 @@ const userSchema = new Schema(
       zipCode: String,
       country: String,
     },
-   // account status and management fields
+    // account status and management fields
     isActive: {
       type: Boolean,
       default: true,
@@ -131,45 +147,45 @@ const userSchema = new Schema(
 
 // Hashing password before saving
 userSchema.pre("save", async function () {
-    if (!this.isModified("password")) return;
-    this.password = await bcrypt.hash(this.password, 10)
-})  
+  if (!this.isModified("password") || !this.password) return;
+  this.password = await bcrypt.hash(this.password, 10);
+});
 
 // Instance method to compare password
-userSchema.methods.isPasswordCorrect = async function (password) {   
+userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
 // Generate JWT tokens
 userSchema.methods.generateAccessToken = function () {
-    return jwt.sign(
+  return jwt.sign(
     {
-        _id: this._id,
-        emial: this.email,
-        password: this.password
-    }, 
+      _id: this._id,
+      email: this.email,
+      role: this.role,
+    },
     process.env.ACCESS_TOKEN_SECRET,
     {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
     }
-    )
-}
+  );
+};
 
 // Generate refresh token
 userSchema.methods.generateRefreshToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
-        }
-    )
-}
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    }
+  );
+};
 
 // Automaticaly filter out inactive users on find queries
-userSchema.pre(/^find/, function (next) {
+userSchema.pre(/^find/, function () {
   if (!this.getOptions().includeInactive) {
     this.find({ isActive: true });
   }
@@ -182,6 +198,5 @@ userSchema.virtual("fullAddress").get(function () {
   const { street, city, state, zipCode, country } = this.address;
   return `${street ? street + ", " : ""}${city ? city + ", " : ""}${state ? state + ", " : ""}${zipCode ? zipCode + ", " : ""}${country || ""}`;
 });
-
 
 export const User = mongoose.model("User", userSchema);

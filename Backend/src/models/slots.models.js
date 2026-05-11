@@ -1,9 +1,9 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const slotSchema = new Schema(
   {
     slotNumber: {
-      type: Number,
+      type: String,
       required: true,
       index: 1,
     },
@@ -43,9 +43,9 @@ const slotSchema = new Schema(
     },
     bookedBy: {
       type: Schema.Types.ObjectId,
-      ref: "User", 
+      ref: "User",
       default: null,
-    }
+    },
   },
   {
     timestamps: true,
@@ -53,11 +53,15 @@ const slotSchema = new Schema(
 );
 
 slotSchema.index(
-  { 
-    doctor: 1, 
-    date: 1, 
-    startTime: 1 
+  {
+    doctorId: 1,
+    date: 1,
+    startTime: 1,
   },
-  { unique: true });
+  { unique: true }
+);
 
-export const Slot = mongoose.model("Slot", slotSchema)
+// Optimize availability queries
+slotSchema.index({ doctorId: 1, status: 1, date: 1 });
+
+export const Slot = mongoose.model("Slot", slotSchema);
