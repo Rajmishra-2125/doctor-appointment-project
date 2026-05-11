@@ -1,4 +1,4 @@
-import mongoose, { Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const sessionSchema = new Schema(
   {
@@ -9,35 +9,35 @@ const sessionSchema = new Schema(
       index: true,
     },
     refreshToken: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
+      required: true,
+      unique: true,
     },
     deviceInfo: {
-        userAgent: String,
-        ipAddress: String,
-        device: String,
-        os: String,
-        browser: String,
+      userAgent: String,
+      ipAddress: String,
+      device: String,
+      os: String,
+      browser: String,
     },
     isActive: {
-        type: Boolean,
-        default: true,
-        index: true,
+      type: Boolean,
+      default: true,
+      index: true,
     },
     expiresAt: {
-        type: Date,
-        required: true,
-        index: true,
+      type: Date,
+      required: true,
+      index: true,
     },
     lastUsedAt: {
-        type: Date,
-        default: Date.now,
-    },   
+      type: Date,
+      default: Date.now,
+    },
   },
   {
-    timestamps: true,   
+    timestamps: true,
   }
-);       
+);
 
 export const Session = mongoose.model("Session", sessionSchema);
