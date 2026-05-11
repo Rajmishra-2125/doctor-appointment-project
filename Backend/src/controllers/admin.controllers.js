@@ -4,7 +4,7 @@ import { Doctor } from "../models/doctor.models.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Review } from "../models/review.models.js";
-import { Session } from "../models/Session.models.js";
+import { Session } from "../models/session.models.js";
 import { Appointment } from "../models/appointment.models.js";
 import { Follow } from "../models/follow.models.js";
 import { Slot } from "../models/slots.models.js";
