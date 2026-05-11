@@ -4,6 +4,7 @@ import {
   applyForBooking,
   cancelBooking,
   myAppointments,
+  getDoctorAppointments,
   getAppointmentDetailsBySlotId,
   updateAppointmentStatus,
   rescheduleAppointment,
@@ -14,6 +15,9 @@ const router = Router();
 
 // Get my appointments
 router.route("/").get(verifyJWT, myAppointments);
+
+// Get doctor appointments
+router.route("/doctor-appointments").get(verifyJWT, getDoctorAppointments);
 
 // Get/Update specific appointment
 // Get Appointment details by Slot ID (New Route)
