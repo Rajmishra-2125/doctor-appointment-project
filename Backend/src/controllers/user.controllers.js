@@ -6,7 +6,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiError } from "../utils/ApiError.js";
 import mongoose, { set } from "mongoose";
 import { Review } from "../models/review.models.js";
-import { Session } from "../models/Session.models.js";
+import { Session } from "../models/session.models.js";
 import { Appointment } from "../models/appointment.models.js";
 import { Follow } from "../models/follow.models.js";
 
