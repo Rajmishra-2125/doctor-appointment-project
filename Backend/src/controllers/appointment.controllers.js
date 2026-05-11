@@ -4,24 +4,66 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Slot } from "../models/slots.models.js";
 import { Doctor } from "../models/doctor.models.js";
 import { Appointment } from "../models/appointment.models.js";
+import { Notification } from "../models/notification.models.js";
+import { generateAppointmentId } from "../utils/idGenerators.js";
 import mongoose, { set } from "mongoose";
+import { User } from "../models/user.models.js";
+import { sendEmail } from "../utils/sendEmail.js";
+import { getReceiverSocketId, io } from "../socket.js";
+import { appointmentConfirmationTemplate } from "../utils/emailTemplates.js";
 
-// Get my appointments
+// Get my appointments (Patient)
 const myAppointments = asyncHandler(async (req, res) => {
   const patientId = req.user?._id;
 
   const appointments = await Appointment.find({ patientId: patientId })
-    .populate(
-      "doctorId",
-      "doctor specialization qualification experience consultationFee availableDays timeSlots"
-    )
+    .populate({
+      path: "doctorId",
+      select:
+        "doctor specialization qualification experience consultationFee availableDays timeSlots doctorId",
+      populate: {
+        path: "doctorId",
+        select: "profileImage",
+      },
+    })
+    .populate("slotId", "slotNumber date timeSlots status")
+    .sort({ date: -1 });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, appointments, "My Appointments fetched"));
+});
+
+// Get Doctor Appointments (Doctor Dashboard)
+const getDoctorAppointments = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  if (req.user.role !== "DOCTOR") {
+    throw new ApiError(403, "Only doctors can access this route");
+  }
+
+  // Find the exact Doctor profile tied to this User
+  const doctorProfile = await Doctor.findOne({ doctorId: userId }).setOptions({
+    includeInactive: true,
+  });
+
+  if (!doctorProfile) {
+    throw new ApiError(404, "Doctor profile not found");
+  }
+
+  const appointments = await Appointment.find({ doctorId: doctorProfile._id })
+    .populate("patientId", "fullname profileImage gender age phone email")
     .populate("slotId", "slotNumber date timeSlots status")
     .sort({ date: -1 });
 
   return res
     .status(200)
     .json(
-      new ApiResponse(200, { data: appointments }, "My Appointments fetched")
+      new ApiResponse(
+        200,
+        appointments,
+        "Doctor appointments fetched successfully"
+      )
     );
 });
 
@@ -46,10 +88,15 @@ const getAppointmentDetailsBySlotId = asyncHandler(async (req, res) => {
 
   // Find Appointment
   const appointment = await Appointment.findOne(query)
-    .populate(
-      "doctorId",
-      "doctor specialization qualification experience consultationFee availableDays timeSlots"
-    )
+    .populate({
+      path: "doctorId",
+      select:
+        "doctor specialization qualification experience consultationFee availableDays timeSlots doctorId",
+      populate: {
+        path: "doctorId",
+        select: "profileImage",
+      },
+    })
     .populate("slotId", "slotNumber date timeSlots status");
 
   if (!appointment) {
@@ -58,9 +105,7 @@ const getAppointmentDetailsBySlotId = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      new ApiResponse(200, { data: appointment }, "Appointment details fetched")
-    );
+    .json(new ApiResponse(200, appointment, "Appointment details fetched"));
 });
 
 // Get available slots for a doctor on a specific date
@@ -91,7 +136,9 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid date format. Enter: YYYY-MM-DD");
   }
 
-  const doctor = await Doctor.findOne({ doctor: username.toLowerCase() });
+  const doctor = await Doctor.findOne({
+    doctor: { $regex: new RegExp("^" + username + "$", "i") },
+  }).setOptions({ includeInactive: true });
   if (!doctor) {
     throw new ApiError(404, "Doctor doesn't exists");
   }
@@ -113,9 +160,7 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Slot is not available today");
   }
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, { data: slots }, "Slot is available"));
+  return res.status(200).json(new ApiResponse(200, slots, "Slot is available"));
 });
 
 // Applying for booking an appointment
@@ -158,9 +203,11 @@ const applyForBooking = asyncHandler(async (req, res) => {
   }
 
   console.log(
-    `[DEBUG] applyForBooking: Looking for doctor '${username.toLowerCase()}'`
+    `[DEBUG] applyForBooking: Looking for doctor '${username}' (case-insensitive)`
   );
-  const doctor = await Doctor.findOne({ doctor: username.toLowerCase() });
+  const doctor = await Doctor.findOne({
+    doctor: { $regex: new RegExp("^" + username + "$", "i") },
+  }).setOptions({ includeInactive: true });
   console.log(`[DEBUG] applyForBooking: Found? ${!!doctor}`);
   if (!doctor) {
     throw new ApiError(404, "Doctor doesn't exists");
@@ -245,13 +292,16 @@ const applyForBooking = asyncHandler(async (req, res) => {
   }
 
   try {
+    const appointmentId = await generateAppointmentId();
+
     const appointment = await Appointment.create({
+      appointmentId,
       patientId: patientId,
       doctorId: doctorId,
       slotId: bookedSlot._id, // Renamed from slot -> slotId
       date: bookingDate, // USE CORRECT UTC DATE
       slotNumber: slotNumber,
-      status: "CONFIRMED",
+      status: "PENDING", // PENDING UNTIL PAID
       reason: reason,
       consultationFee: fee,
       timeSlots: `${bookedSlot.startTime} - ${bookedSlot.endTime}`,
@@ -262,19 +312,28 @@ const applyForBooking = asyncHandler(async (req, res) => {
       .updateDoctorStats()
       .catch((err) => console.error("Stats Update Error:", err));
 
-    // Update Doctor Stats (New Appointment Count)
-    doctor
-      .updateDoctorStats()
-      .catch((err) => console.error("Stats Update Error:", err));
+    // --- EMAILS AND DOCTOR STATS ARE OMITTED HERE ---
+    // They are now handled in the /api/payments/verify endpoint when payment is formally collected.
+
+    // Send Real-Time Notification to Doctor
+    const notificationData = {
+      userId: doctor.doctorId,
+      title: "New Appointment",
+      message: `A new appointment has been booked for ${bookingDate.toDateString()}.`,
+      type: "APPOINTMENT",
+      relatedId: appointment._id,
+    };
+    await Notification.create(notificationData);
+
+    const receiverSocketId = getReceiverSocketId(doctor.doctorId.toString());
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("notification", notificationData);
+    }
 
     return res
       .status(200)
       .json(
-        new ApiResponse(
-          200,
-          { data: appointment },
-          "Appointment booked Successfully."
-        )
+        new ApiResponse(200, appointment, "Appointment booked Successfully.")
       );
   } catch (error) {
     // ... (rest of catch block)
@@ -314,7 +373,9 @@ const cancelBooking = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid date format. Enter: YYYY-MM-DD");
   }
 
-  const doctor = await Doctor.findOne({ doctor: username.toLowerCase() });
+  const doctor = await Doctor.findOne({
+    doctor: { $regex: new RegExp("^" + username + "$", "i") },
+  }).setOptions({ includeInactive: true });
 
   if (!doctor) {
     throw new ApiError(404, "Doctor doesn't exists");
@@ -368,6 +429,26 @@ const cancelBooking = asyncHandler(async (req, res) => {
 
   console.log("Appointment cancelled: ", appointment);
 
+  // Send Notification to Doctor/Patient
+  const notifyDoctorId = doctor.doctorId.toString();
+  const notifyPatientId = appointment.patientId.toString();
+  const targetId =
+    req.user.role === "DOCTOR" ? notifyPatientId : notifyDoctorId;
+
+  const notificationData = {
+    userId: targetId,
+    title: "Appointment Cancelled",
+    message: `Appointment on ${appointment.date.toDateString()} was cancelled.`,
+    type: "APPOINTMENT",
+    relatedId: appointment._id,
+  };
+  await Notification.create(notificationData);
+
+  const receiverSocketId = getReceiverSocketId(targetId);
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("notification", notificationData);
+  }
+
   return res
     .status(200)
     .json(
@@ -394,6 +475,23 @@ const updateAppointmentStatus = asyncHandler(async (req, res) => {
 
   if (!appointment) {
     throw new ApiError(404, "Appointment not found");
+  }
+
+  // AUTHORIZATION CHECK
+  if (req.user.role === "DOCTOR") {
+    const doctorProfile = await Doctor.findOne({ doctorId: userId }).setOptions(
+      { includeInactive: true }
+    );
+    if (
+      !doctorProfile ||
+      doctorProfile._id.toString() !== appointment.doctorId.toString()
+    ) {
+      throw new ApiError(403, "Not authorized to update this appointment");
+    }
+  } else if (req.user.role === "PATIENT") {
+    if (appointment.patientId.toString() !== userId.toString()) {
+      throw new ApiError(403, "Not authorized to update this appointment");
+    }
   }
 
   // 1. STATE MACHINE VALIDATION
@@ -425,6 +523,31 @@ const updateAppointmentStatus = asyncHandler(async (req, res) => {
   if (notes) appointment.doctorNotes = notes; // Mapped to doctorNotes schema field
 
   // 3. STATUS SPECIFIC LOGIC
+  if (status === "CONFIRMED") {
+    try {
+      const patientData = await User.findById(appointment.patientId);
+      const doctorData = await Doctor.findById(appointment.doctorId).setOptions(
+        { includeInactive: true }
+      );
+      if (patientData && patientData.email) {
+        const htmlMessage = appointmentConfirmationTemplate(
+          patientData.fullname,
+          doctorData?.doctor || "",
+          appointment.date,
+          appointment.timeSlots,
+          appointment.meetingType
+        );
+        await sendEmail({
+          email: patientData.email,
+          subject: `Appointment Confirmed - ${new Date(appointment.date).toDateString()}`,
+          message: htmlMessage,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to send appointment confirmation email:", err);
+    }
+  }
+
   if (status === "CANCELLED") {
     // Free the Slot
     const slotUpdate = await Slot.findByIdAndUpdate(appointment.slotId, {
@@ -457,12 +580,30 @@ const updateAppointmentStatus = asyncHandler(async (req, res) => {
   await appointment.save();
 
   // Update Doctor Stats (Status Change: Completed/Cancelled)
-  Doctor.findById(appointment.doctorId).then((doc) => {
-    if (doc)
-      doc
-        .updateDoctorStats()
-        .catch((err) => console.error("Stats Update Error:", err));
-  });
+  Doctor.findById(appointment.doctorId)
+    .setOptions({ includeInactive: true })
+    .then((doc) => {
+      if (doc)
+        doc
+          .updateDoctorStats()
+          .catch((err) => console.error("Stats Update Error:", err));
+    });
+
+  const notificationData = {
+    userId: appointment.patientId,
+    title: `Status: ${status}`,
+    message: `Your appointment status was updated to ${status}.`,
+    type: "APPOINTMENT",
+    relatedId: appointment._id,
+  };
+  await Notification.create(notificationData);
+
+  const receiverSocketId = getReceiverSocketId(
+    appointment.patientId.toString()
+  );
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("notification", notificationData);
+  }
 
   return res
     .status(200)
@@ -488,6 +629,23 @@ const rescheduleAppointment = asyncHandler(async (req, res) => {
   const appointment = await Appointment.findById(appointmentId);
   if (!appointment) {
     throw new ApiError(404, "Appointment not found");
+  }
+
+  // AUTHORIZATION CHECK
+  if (req.user.role === "DOCTOR") {
+    const doctorProfile = await Doctor.findOne({ doctorId: userId }).setOptions(
+      { includeInactive: true }
+    );
+    if (
+      !doctorProfile ||
+      doctorProfile._id.toString() !== appointment.doctorId.toString()
+    ) {
+      throw new ApiError(403, "Not authorized to reschedule this appointment");
+    }
+  } else if (req.user.role === "PATIENT") {
+    if (appointment.patientId.toString() !== userId.toString()) {
+      throw new ApiError(403, "Not authorized to reschedule this appointment");
+    }
   }
 
   // 1. VALIDATION: Prevent rescheduling terminal states
@@ -568,12 +726,14 @@ const rescheduleAppointment = asyncHandler(async (req, res) => {
   await appointment.save();
 
   // Update Stats (Sync Reschedule history)
-  Doctor.findById(appointment.doctorId).then((doc) => {
-    if (doc)
-      doc
-        .updateDoctorStats()
-        .catch((err) => console.error("Stats Update Error:", err));
-  });
+  Doctor.findById(appointment.doctorId)
+    .setOptions({ includeInactive: true })
+    .then((doc) => {
+      if (doc)
+        doc
+          .updateDoctorStats()
+          .catch((err) => console.error("Stats Update Error:", err));
+    });
 
   return res
     .status(200)
@@ -584,6 +744,7 @@ const rescheduleAppointment = asyncHandler(async (req, res) => {
 
 export {
   myAppointments,
+  getDoctorAppointments,
   getAppointmentDetailsBySlotId,
   getAvailableSlots,
   applyForBooking,
