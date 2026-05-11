@@ -42,7 +42,11 @@ const addReview = asyncHandler(async (req, res) => {
     isApproved: true, // Auto-approve
   });
 
-  // 3. Update Doctor's Stats (Ratings + Counts)
+  // 3. Flag Appointment as correctly reviewed
+  appointment.isReviewed = true;
+  await appointment.save();
+
+  // 4. Update Doctor's Stats (Ratings + Counts)
   const doctor = await Doctor.findById(appointment.doctorId);
   if (doctor) {
     await doctor.updateDoctorStats();
