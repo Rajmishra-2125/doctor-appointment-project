@@ -17,6 +17,13 @@ import { OTP } from "../models/otp.models.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Cookie options — secure only in production (localhost HTTP doesn't support secure cookies)
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+};
+
 // Generate Access and Refresh Token
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -214,16 +221,10 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  };
-
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
         200,
@@ -256,15 +257,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Invalid refresh token");
     }
 
-    if (incomingRefreshToken == user?.refreshToken) {
+    if (incomingRefreshToken !== user?.refreshToken) {
       throw new ApiError(401, "Refresh token is expired or used");
     }
-
-    const options = {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    };
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
       user._id
@@ -274,8 +269,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     return res
       .status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", refreshToken, options)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
       .json(
         new ApiResponse(
           200,
@@ -341,16 +336,10 @@ const googleAuthLogin = asyncHandler(async (req, res) => {
       "-password -refreshToken"
     );
 
-    const options = {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    };
-
     return res
       .status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", refreshToken, options)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
       .json(
         new ApiResponse(
           200,
@@ -372,16 +361,10 @@ const logoutUser = asyncHandler(async (req, res) => {
     },
   });
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  };
-
   return res
     .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
     .json(new ApiResponse(200, "User loggedOut successfully"));
 });
 
@@ -473,16 +456,10 @@ const verifyEmailOTP = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  };
-
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
         200,
