@@ -5,7 +5,7 @@ import {
   updateUserPersonalDetails,
   updateProfileAddress,
   updateUserAvatar,
-} from "../../../../features/auth/authSlice";
+} from "../../../../features/auth/AuthSlice";
 import { 
   Camera, User, Mail, Phone, MapPin, Calendar, Save, X, Edit2, 
   Stethoscope, Award, Briefcase, IndianRupee, Building, Star, Activity 

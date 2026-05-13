@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Search, Download, HeartPulse, UserCircle, Loader2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDoctorPatients, fetchDoctorAppointments } from '../../../features/appointments/doctorAppointmentSlice';
-import PatientDetailsModal from '../components/PatientDetailsModal';
+import PatientDetailsModal from '../components/Patient/PatientDetailsModal';
 
 const DoctorPatients = () => {
   const dispatch = useDispatch();
