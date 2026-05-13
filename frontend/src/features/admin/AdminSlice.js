@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import adminService from "../../services/adminServices.js";
+import adminService from "../../services/adminService";
 
 const initialState = {
   stats: null,
@@ -22,12 +22,14 @@ export const getDashboardStats = createAsyncThunk(
       return await adminService.getDashboardStats(period);
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Get all users
@@ -38,12 +40,14 @@ export const getAllUsers = createAsyncThunk(
       return await adminService.getAllUsers();
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Get all doctors
@@ -54,12 +58,14 @@ export const getAllDoctors = createAsyncThunk(
       return await adminService.getAllDoctors();
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Get all appointments
@@ -70,12 +76,14 @@ export const getAllAppointments = createAsyncThunk(
       return await adminService.getAllAppointments();
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Get all slots
@@ -86,12 +94,14 @@ export const getAllSlots = createAsyncThunk(
       return await adminService.getAllSlots();
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Create slot
@@ -102,12 +112,14 @@ export const createSlot = createAsyncThunk(
       return await adminService.createSlot(slotData);
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Book appointment
@@ -118,12 +130,14 @@ export const bookAppointment = createAsyncThunk(
       return await adminService.bookAppointment(appointmentData);
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Reschedule appointment
@@ -131,15 +145,20 @@ export const rescheduleAppointment = createAsyncThunk(
   "admin/rescheduleAppointment",
   async ({ appointmentId, rescheduleData }, thunkAPI) => {
     try {
-      return await adminService.rescheduleAppointment(appointmentId, rescheduleData);
+      return await adminService.rescheduleAppointment(
+        appointmentId,
+        rescheduleData,
+      );
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Create doctor
@@ -150,12 +169,14 @@ export const createDoctor = createAsyncThunk(
       return await adminService.createDoctor(doctorData);
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Approve doctor
@@ -166,12 +187,14 @@ export const approveDoctor = createAsyncThunk(
       return await adminService.approveDoctor(doctorId);
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Reject doctor
@@ -182,12 +205,14 @@ export const rejectDoctor = createAsyncThunk(
       return await adminService.rejectDoctor(doctorId);
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Delete doctor
@@ -198,12 +223,14 @@ export const deleteDoctor = createAsyncThunk(
       return await adminService.deleteDoctor(doctorId);
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Delete patient
@@ -214,12 +241,32 @@ export const deletePatient = createAsyncThunk(
       return await adminService.deletePatient(userId);
     } catch (error) {
       const message =
-        (error.response && error.response.data && error.response.data.message) ||
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
     }
-  }
+  },
+);
+
+// Update user status
+export const updateUserStatus = createAsyncThunk(
+  "admin/updateUserStatus",
+  async ({ userId, statusData }, thunkAPI) => {
+    try {
+      return await adminService.updateUserStatus(userId, statusData);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
 );
 
 export const adminSlice = createSlice({
@@ -341,7 +388,9 @@ export const adminSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.message = action.payload.message;
-        const index = state.appointments.findIndex(apt => apt._id === action.payload.data._id);
+        const index = state.appointments.findIndex(
+          (apt) => apt._id === action.payload.data._id,
+        );
         if (index !== -1) state.appointments[index] = action.payload.data;
       })
       .addCase(rescheduleAppointment.rejected, (state, action) => {
@@ -368,27 +417,54 @@ export const adminSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.message = action.payload.message;
-        const index = state.doctors.findIndex(doc => doc._id === action.payload.data._id);
+        const index = state.doctors.findIndex(
+          (doc) => doc._id === action.payload.data._id,
+        );
         if (index !== -1) state.doctors[index] = action.payload.data;
       })
       .addCase(rejectDoctor.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.message = action.payload.message;
-        const index = state.doctors.findIndex(doc => doc._id === action.payload.data._id);
+        const index = state.doctors.findIndex(
+          (doc) => doc._id === action.payload.data._id,
+        );
         if (index !== -1) state.doctors[index] = action.payload.data;
       })
       .addCase(deleteDoctor.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.message = action.payload.message;
-        state.doctors = state.doctors.filter(doc => doc._id !== action.payload.data._id);
+        state.doctors = state.doctors.filter(
+          (doc) => doc._id !== action.payload.data._id,
+        );
       })
       .addCase(deletePatient.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.message = action.payload.message;
-        state.users = state.users.filter(user => user._id !== action.payload.data._id);
+        state.users = state.users.filter(
+          (user) => user._id !== action.payload.data._id,
+        );
+      })
+      .addCase(updateUserStatus.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateUserStatus.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.message = action.payload.message;
+        const index = state.users.findIndex(
+          (user) => user._id === action.payload.data._id,
+        );
+        if (index !== -1) {
+          state.users[index] = action.payload.data;
+        }
+      })
+      .addCase(updateUserStatus.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
       });
   },
 });
