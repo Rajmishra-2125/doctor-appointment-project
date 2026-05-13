@@ -3,8 +3,8 @@ import { Pill, Plus, Search, CheckCircle, Clock, Loader2, Mail } from 'lucide-re
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDoctorPrescriptions, emailPrescription, fetchDoctorAppointments, updateDoctorAppointmentStatus } from '../../../features/appointments/doctorAppointmentSlice';
 import toast from 'react-hot-toast';
-import PrescriptionModal from '../components/PrescriptionModal';
-import PrescriptionViewerModal from '../components/PrescriptionViewerModal';
+import PrescriptionModal from '../components/Prescriptions/PrescriptionModal';
+import PrescriptionViewerModal from '../components/Prescriptions/PrescriptionViewerModal';
 
 const ManagePrescriptions = () => {
   const dispatch = useDispatch();
