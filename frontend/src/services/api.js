@@ -1,21 +1,114 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
+// 1. Environment variables
+// Automatically falls back to localhost if env variable is surprisingly missing
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'https://medicare-healthcare-app.onrender.com/api/v1',
+  // 4. Secure cookies - instructs Axios to securely attach HttpOnly cookies to every outgoing request
   withCredentials: true,
 });
 
-// Add a request interceptor to add the auth token to every request
-api.interceptors.request.use(
-  (config) => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    
-    if (user && user.accessToken) {
-      config.headers.Authorization = `Bearer ${user.accessToken}`;
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
     }
-    return config;
-  },
-  (error) => {
+  });
+  failedQueue = [];
+};
+
+// 3. Logout helper function
+// Keeps session clearing logic in one clean, exported module
+export const forceLogout = () => {
+  localStorage.removeItem("user");
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login';
+  }
+};
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    
+    // 2. Network error handling
+    // Triggers if the server is offline, CORS blocks the request, or internet is disconnected.
+    if (!error.response) {
+      if (!window.navigator.onLine) {
+        toast.error("No internet connection available.");
+      } else {
+        toast.error("Network Error - Server unreachable. Please try again later.");
+      }
+      return Promise.reject(error);
+    }
+
+    const originalRequest = error.config;
+
+    // 5. Refresh token rotation
+    if (
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/auth/refresh-token') &&
+      !originalRequest.url.includes('/auth/login')
+    ) {
+      if (isRefreshing) {
+        return new Promise(function(resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+        .then(() => {
+          return api(originalRequest);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Attempt to refresh the token using an independent axios instance
+        // so we don't trigger the interceptor again
+        await axios.get(
+          `${api.defaults.baseURL}/auth/refresh-token`,
+          { withCredentials: true } // Crucial: passes the secure refresh_token HttpOnly cookie
+        );
+
+        isRefreshing = false;
+        processQueue(null, true);
+
+        // Replay the original request now that cookies are successfully refreshed
+        return api(originalRequest);
+      } catch (err) {
+        processQueue(err, null);
+        isRefreshing = false;
+
+        // Refresh failed, token is genuinely dead. Safely boot them out.
+        forceLogout();
+        return Promise.reject(err);
+      }
+    }
+
+    // Default 401 error handling catching edge cases / unauthorized access
+    if (error.response.status === 401) {
+        const message = error.response.data?.message;
+        console.error("401 ERROR CAUGHT IN INTERCEPTOR:", message, "URL:", originalRequest.url);
+        if (
+          message === "Invalid access token" ||
+          message === "Unauthorized" ||
+          message === "Invalid acess token" ||
+          message === "Token expired"
+        ) {
+          console.error("FORCING LOGOUT due to:", message);
+          forceLogout();
+        }
+    }
+
     return Promise.reject(error);
   }
 );

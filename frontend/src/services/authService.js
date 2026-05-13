@@ -11,24 +11,43 @@ const register = async (userData) => {
   return response.data.data;
 };
 
+// Google Login user
+const googleLogin = async (tokenData) => {
+  const response = await api.post("/auth/google", tokenData);
+
+  if (response.data) {
+    localStorage.setItem("user", JSON.stringify(response.data.data.user));
+  }
+
+  return response.data.data.user;
+};
+
 // Login user
 const login = async (userData) => {
   const response = await api.post("/auth/login", userData);
 
   if (response.data) {
     localStorage.setItem("user", JSON.stringify(response.data.data.user));
-    // Also storing accessToken if needed, but let's stick to storing the user object for now
-    // Ideally we should store tokens securely.
   }
 
-  // Return the user data
+  return response.data.data.user;
+};
+
+// Verify OTP
+const verifyOTP = async (otpData) => {
+  const response = await api.post("/auth/verify-otp", otpData);
+
+  if (response.data) {
+    localStorage.setItem("user", JSON.stringify(response.data.data.user));
+  }
+
   return response.data.data.user;
 };
 
 // Logout user
 const logout = async () => {
   try {
-    await api.post("/users/logout");
+    await api.post("/auth/logout");
   } catch (error) {
     console.error("Logout failed on server", error);
   }
@@ -107,6 +126,8 @@ const authService = {
   register,
   logout,
   login,
+  googleLogin,
+  verifyOTP,
   updateAccountDetails,
   updateAddressDetails,
   updateAvatar,
