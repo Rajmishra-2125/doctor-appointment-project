@@ -26,7 +26,7 @@ import {
 import DoctorReviewsModal from "./DoctorReviewsModal.jsx";
 
 import { useDispatch, useSelector } from "react-redux";
-import { getAllDoctors } from "../../../../features/doctors/doctorSlice";
+import { getAllDoctors } from "../../../../features/doctors/DoctorSlice";
 
 function Doctors() {
   const dispatch = useDispatch();

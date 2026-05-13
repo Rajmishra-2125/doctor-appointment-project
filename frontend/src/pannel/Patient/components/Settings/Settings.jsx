@@ -6,7 +6,7 @@ import {
   updateUserPersonalDetails,
   updateUserAvatar,
   changePassword,
-} from "../../../features/auth/authSlice";
+} from "../../../features/auth/AuthSlice";
 import toast from "react-hot-toast";
 
 const PatientSettings = () => {

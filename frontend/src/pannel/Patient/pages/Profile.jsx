@@ -5,7 +5,7 @@ import {
   updateUserPersonalDetails,
   updateProfileAddress,
   updateUserAvatar,
-} from "../../../features/auth/authSlice";
+} from "../../../features/auth/AuthSlice";
 import {
   Camera,
   User,
