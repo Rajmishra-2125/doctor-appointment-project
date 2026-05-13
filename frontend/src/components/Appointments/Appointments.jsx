@@ -29,7 +29,7 @@ import {
   Share2,
   Star,
 } from "lucide-react";
-import MyAppointments from "../../panels/Patient/pages/MyAppointments.jsx";
+import MyAppointments from "../../pannel/Patient/components/Appointments/MyAppointments";
 import appointmentService from "../../services/appointmentService";
 import doctorService from "../../services/doctorService";
 
