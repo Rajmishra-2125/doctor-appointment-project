@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../features/auth/authSlice";
-import doctorReducer from "../features/doctors/doctorSlice";
-import adminReducer from "../features/admin/adminSlice";
+import authReducer from "../features/auth/AuthSlice";
+import doctorReducer from "../features/doctors/DoctorSlice";
+import adminReducer from "../features/admin/AdminSlice";
 import agentReducer from "../features/agent/agentSlice";
 import doctorAppointmentReducer from "../features/appointments/doctorAppointmentSlice";
 import notificationReducer from "../features/notifications/notificationSlice";
