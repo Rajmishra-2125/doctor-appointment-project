@@ -27,10 +27,27 @@ const processQueue = (error, token = null) => {
 // Keeps session clearing logic in one clean, exported module
 export const forceLogout = () => {
   localStorage.removeItem("user");
+  localStorage.removeItem("accessToken");
   if (window.location.pathname !== '/login') {
     window.location.href = '/login';
   }
 };
+
+// 4. Request Interceptor (Crucial for Cross-Domain Auth)
+// Attaches the accessToken from localStorage to every request.
+// This ensures authentication works even if the browser blocks third-party cookies (e.g. Safari, Incognito).
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 api.interceptors.response.use(
   (response) => response,
