@@ -20,26 +20,6 @@ export default defineConfig({
     // Increase chunk size warning limit to hide the cosmetic warning
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
-      output: {
-        manualChunks(id) {
-          // Split node_modules into a separate vendor chunk to save memory during build
-          if (id.includes('node_modules')) {
-            // Must include 'scheduler' with react because react-dom depends on it internally
-            if (
-              id.includes('/react/') || 
-              id.includes('/react-dom/') || 
-              id.includes('/react-router') ||
-              id.includes('/scheduler/')
-            ) {
-              return 'vendor-react';
-            }
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            return 'vendor-core';
-          }
-        }
-      },
       onwarn(warning, warn) {
         // Suppress "use client" / "use server" directive warnings from third-party packages
         if (warning.code === "MODULE_LEVEL_DIRECTIVE") return;
