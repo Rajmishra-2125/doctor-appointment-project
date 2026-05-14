@@ -297,18 +297,43 @@ const googleAuthLogin = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Verify the JWT ID token returned by the GoogleLogin component
-    const ticket = await client.verifyIdToken({
-      idToken: googleToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    let email, name, picture, googleId;
 
-    const payload = ticket.getPayload();
-    if (!payload) {
-      throw new Error("Invalid Google token payload");
+    try {
+      // First try to verify as an ID token (JWT)
+      const ticket = await client.verifyIdToken({
+        idToken: googleToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) throw new Error("Invalid Google token payload");
+
+      email = payload.email;
+      name = payload.name;
+      picture = payload.picture;
+      googleId = payload.sub;
+    } catch (idTokenError) {
+      // If it fails, assume it's an access_token (from useGoogleLogin hook)
+      try {
+        const response = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${googleToken}` }
+        });
+        
+        if (!response.ok) {
+          throw new Error("Invalid Google token");
+        }
+        
+        const data = await response.json();
+        email = data.email;
+        name = data.name;
+        picture = data.picture;
+        googleId = data.sub;
+      } catch (accessTokenError) {
+        throw new Error("Failed to authenticate with Google: " + accessTokenError.message);
+      }
     }
 
-    const { email, name, picture, sub: googleId } = payload;
     const normalizedEmail = email.toLowerCase().trim();
 
     let user = await User.findOne({ email: normalizedEmail }).select(
