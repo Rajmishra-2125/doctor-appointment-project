@@ -125,7 +125,7 @@ const ManageAnalytics = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6 max-w-400 mx-auto pb-10 mt-8">
+      <div className="space-y-6 max-w-[1600px] mx-auto pb-10 mt-8">
         {/* Header Skeleton */}
         <div className="flex justify-between items-end mb-8">
           <div className="space-y-2">
@@ -154,7 +154,7 @@ const ManageAnalytics = () => {
 
         {/* Charts Skeletons */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm h-100 flex flex-col">
+          <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm h-[400px] flex flex-col">
             <Skeleton className="w-48 h-6 rounded-md mb-8" />
             <div className="flex-1 flex items-end gap-4 px-4 overflow-hidden">
               {[...Array(7)].map((_, i) => (
@@ -163,7 +163,7 @@ const ManageAnalytics = () => {
             </div>
           </div>
           
-          <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm h-100 flex flex-col">
+          <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm h-[400px] flex flex-col">
             <Skeleton className="w-48 h-6 rounded-md mb-8" />
             <div className="flex-1 flex items-center justify-center">
               <Skeleton variant="circle" className="w-64 h-64 border-16 border-gray-50 dark:border-slate-800/50 bg-transparent!" />
@@ -175,7 +175,7 @@ const ManageAnalytics = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-400 mx-auto animate-fade-in pb-8">
+    <div className="space-y-6 max-w-[1600px] mx-auto animate-fade-in pb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -238,7 +238,7 @@ const ManageAnalytics = () => {
               <Filter className="w-5 h-5" />
             </button>
           </div>
-          <div className="h-75 w-full">
+          <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dynamicChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -265,7 +265,7 @@ const ManageAnalytics = () => {
             <p className="text-sm text-gray-500 dark:text-slate-400">Distribution of patients</p>
           </div>
           <div className="flex-1 flex flex-col justify-center relative">
-            <div className="h-55 w-full">
+            <div className="h-[220px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -308,7 +308,7 @@ const ManageAnalytics = () => {
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">Appointments Breakdown</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400">Online vs In-person visitations</p>
           </div>
-          <div className="h-62.5 w-full">
+          <div className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dynamicChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={12}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#1e293b' : '#f1f5f9'} />

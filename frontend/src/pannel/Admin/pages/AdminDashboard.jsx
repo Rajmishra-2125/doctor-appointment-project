@@ -112,10 +112,10 @@ const AdminDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-400 mx-auto animate-fade-in pb-10">
+      <div className="space-y-6 max-w-[1600px] mx-auto animate-fade-in pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-start h-26">
+            <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-start h-[104px]">
                <div className="space-y-3 w-3/4">
                  <Skeleton className="h-4 w-32" />
                  <Skeleton className="h-8 w-24" />
@@ -126,7 +126,7 @@ const AdminDashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden h-112.5">
+          <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden h-[450px]">
              <div className="p-6 border-b border-gray-100 dark:border-slate-800">
                <Skeleton className="h-6 w-48" />
              </div>
@@ -142,7 +142,7 @@ const AdminDashboard = () => {
                 ))}
              </div>
           </div>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 h-112.5">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 h-[450px]">
              <Skeleton className="h-6 w-32 mb-6" />
              <div className="space-y-3">
                {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 rounded-xl w-full" />)}
@@ -174,7 +174,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-400 mx-auto animate-fade-in">
+    <div className="space-y-6 max-w-[1600px] mx-auto animate-fade-in">
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {statCards.map((stat, index) => (
@@ -275,7 +275,7 @@ const AdminDashboard = () => {
             ))}
           </div>
         </div>
-        <div className="p-6 h-87.5 w-full relative">
+        <div className="p-6 h-[350px] w-full relative">
           {isChartLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-[1px]">
               <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
