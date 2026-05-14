@@ -183,9 +183,11 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "password is required");
   }
 
+  const normalizedEmail = email.toLowerCase().trim();
+
   const user = await User.findOne({
-    email,
-  }).select("+password");
+    email: normalizedEmail,
+}).select("+password");
 
   if (!user) {
     throw new ApiError(404, "user not found");
@@ -215,10 +217,13 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 
   const options = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  };
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production"
+    ? "none"
+    : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
 
   return res
     .status(200)
@@ -256,9 +261,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Invalid refresh token");
     }
 
-    if (incomingRefreshToken == user?.refreshToken) {
-      throw new ApiError(401, "Refresh token is expired or used");
-    }
+    if (incomingRefreshToken !== user?.refreshToken) {
+  throw new ApiError(401, "Refresh token is invalid or used");
+}
 
     const options = {
       httpOnly: true,
