@@ -232,7 +232,7 @@ const bookAppointment = async (
 
     return {
       success: true,
-      message: `Appointment successfully booked with Dr. ${doctor.doctor} on ${slot.date.toLocaleDateString()} at ${slot.startTime}. Appointment Number: ${newApt.appointmentId} (Slot: ${slot.slotNumber}). Please instruct the user to complete their payment using this link: [Pay Now](/patient/payment/${newApt._id})`,
+      message: `Appointment slot successfully reserved with Dr. ${doctor.doctor} on ${slot.date.toLocaleDateString()} at ${slot.startTime}. Appointment Number: ${newApt.appointmentId}. Please instruct the user that their slot is temporarily reserved for 15 minutes, and they MUST complete their payment to permanently confirm it using this link: [Complete Payment](/patient/payment/${newApt._id})`,
     };
   } catch (error) {
     return {
@@ -393,8 +393,8 @@ STRICT RULES FOR TOOL USE:
 CONVERSATION FLOW:
 - If user mentions a doctor name → call search_doctors first.
 - If user asks for timings/slots → call get_available_slots.
-- Before booking → summarize slot details and ask "Shall I confirm this appointment?".
-- After booking → share the reference ID, wish them well, and you MUST provide the markdown payment link returned by the tool so they can pay.
+- Before booking → summarize slot details and ask "Shall I reserve this appointment?".
+- After booking → share the reference ID, wish them well, and you MUST provide the markdown payment link returned by the tool. Warn them that the slot is only reserved for 15 minutes until they pay.
 
 FALLBACKS:
 - If no doctor found → DO NOT ask the user about spelling or uppercase/lowercase. The database is already case-insensitive. Simply state the doctor is not on staff and offer to show alternative doctors matching their specialty!
