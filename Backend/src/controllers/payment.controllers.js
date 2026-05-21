@@ -1,4 +1,4 @@
-import Razorpay from "razorpay";
+import { Cashfree } from "cashfree-pg";
 import crypto from "crypto";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -8,21 +8,21 @@ import { Doctor } from "../models/doctor.models.js";
 import { User } from "../models/user.models.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
-// Initialize razorpay instance
-const getRazorpayInstance = () => {
-  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+// Initialize Cashfree instance
+const initializeCashfree = () => {
+  if (!process.env.CASHFREE_APP_ID || !process.env.CASHFREE_SECRET_KEY) {
     throw new ApiError(
       500,
-      "Razorpay API keys are not configured in environment variables"
+      "Cashfree API keys are not configured in environment variables"
     );
   }
-  return new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-  });
+  Cashfree.XClientId = process.env.CASHFREE_APP_ID;
+  Cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY;
+  // Use SANDBOX for dev/test, PRODUCTION for live
+  Cashfree.XEnvironment = Cashfree.Environment.SANDBOX; 
 };
 
-// Create a new Razorpay Order
+// Create a new Cashfree Order
 export const createOrder = asyncHandler(async (req, res) => {
   const { appointmentId } = req.body;
 
@@ -33,7 +33,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     );
   }
 
-  const appointment = await Appointment.findById(appointmentId);
+  const appointment = await Appointment.findById(appointmentId).populate("patientId");
   if (!appointment) {
     throw new ApiError(404, "Appointment not found");
   }
@@ -42,54 +42,58 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Appointment consultation fee is already paid");
   }
 
-  const razorpay = getRazorpayInstance();
+  initializeCashfree();
 
-  // Razorpay amount is in paise (1 INR = 100 paise)
-  // Add fallback if consultationFee is 0 or NaN
-  const feeInPaisa = appointment.consultationFee
-    ? Math.round(appointment.consultationFee * 100)
-    : 0;
+  // Cashfree amount is in standard decimals (e.g. 500.00)
+  const fee = appointment.consultationFee ? Number(appointment.consultationFee) : 0;
 
-  if (feeInPaisa <= 0) {
+  if (fee <= 0) {
     throw new ApiError(
       400,
       "Consultation fee is not valid for payment processing"
     );
   }
 
-  const options = {
-    amount: feeInPaisa,
-    currency: "INR",
-    receipt: `receipt_apptim_${appointment._id}`,
+  const patient = appointment.patientId;
+  const orderId = `order_${appointment._id}_${Date.now()}`;
+
+  const request = {
+    order_amount: fee,
+    order_currency: "INR",
+    order_id: orderId,
+    customer_details: {
+      customer_id: `cust_${patient._id}`,
+      customer_name: patient.fullname || "Patient",
+      customer_email: patient.email || "patient@medicare.com",
+      customer_phone: patient.phone || "9999999999",
+    },
+    order_meta: {
+      return_url: `${process.env.FRONTEND_URL || "http://localhost:5173"}/patient/appointments` // Fallback URL
+    }
   };
 
   try {
-    const order = await razorpay.orders.create(options);
+    const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+
+    // Save session ID for future reference
+    appointment.cashfreeOrderId = response.data.order_id;
+    appointment.cashfreeSessionId = response.data.payment_session_id;
+    await appointment.save();
 
     return res
       .status(200)
-      .json(new ApiResponse(200, order, "Payment order created successfully"));
+      .json(new ApiResponse(200, response.data, "Payment order created successfully"));
   } catch (error) {
-    console.error("Razorpay Order Creation Error:", error);
-    throw new ApiError(500, "Failed to create payment order with Razorpay");
+    console.error("Cashfree Order Creation Error:", error.response?.data || error);
+    throw new ApiError(500, "Failed to create payment order with Cashfree");
   }
 });
 
-// Verify signature and mark Paid
+// Verify payment status with Cashfree
 export const verifyPayment = asyncHandler(async (req, res) => {
-  const {
-    razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature,
-    appointmentId,
-  } = req.body;
+  const { order_id, appointmentId } = req.body;
 
-  if (
-    !razorpay_order_id ||
-    !razorpay_payment_id ||
-    !razorpay_signature ||
-    !appointmentId
-  ) {
+  if (!order_id || !appointmentId) {
     throw new ApiError(400, "Missing required payment breakdown details");
   }
 
@@ -98,89 +102,89 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Appointment not found");
   }
 
-  // Verify Signature
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(body.toString())
-    .digest("hex");
+  initializeCashfree();
 
-  if (expectedSignature !== razorpay_signature) {
-    // Handle failed payment case here if needed.
-    appointment.paymentStatus = "FAILED";
-    await appointment.save();
-    throw new ApiError(400, "Payment verification failed. Invalid signature.");
-  }
-
-  // Payment is successful
-  appointment.paymentStatus = "PAID";
-  appointment.paymentMethod = "RAZORPAY";
-  appointment.status = "CONFIRMED"; // Now we officially confirm it
-  appointment.paidAt = new Date();
-  appointment.razorpayOrderId = razorpay_order_id;
-  appointment.razorpayPaymentId = razorpay_payment_id;
-
-  await appointment.save();
-
-  // Now dispatch emails and stats since we officially lock in the confirmed paid status
-  const doctor = await Doctor.findById(appointment.doctorId);
-  if (doctor) {
-    // Update stats
-    doctor
-      .updateDoctorStats()
-      .catch((err) => console.error("Stats Update Error:", err));
-
-    try {
-      const patientUser = await User.findById(appointment.patientId);
-      const doctorUser = await User.findById(doctor.doctorId);
-
-      // Dispatch Patient Email
-      if (patientUser) {
-        await sendEmail({
-          email: patientUser.email,
-          subject: "Payment Received & Appointment Confirmed - MediCare",
-          message: `
-                      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
-                        <h1 style="color: #2563eb; text-align: center;">Appointment Confirmed! 🎉</h1>
-                        <p style="font-size: 16px; color: #333;">Hi <strong>${patientUser.fullname}</strong>,</p>
-                        <p style="font-size: 16px; color: #333;">Your payment was successful and your appointment has been confirmed! Here are your official booking details:</p>
-                        <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                          <p style="margin: 5px 0;"><strong>Doctor:</strong> Dr. ${doctor.doctorDetails?.fullname || doctor.doctor}</p>
-                          <p style="margin: 5px 0;"><strong>Date:</strong> ${appointment.date.toDateString()}</p>
-                          <p style="margin: 5px 0;"><strong>Time:</strong> ${appointment.timeSlots}</p>
-                          <p style="margin: 5px 0;"><strong>Consultation Fee:</strong> ₹${appointment.consultationFee} (PAID)</p>
-                          <p style="margin: 5px 0;"><strong>Payment ID:</strong> ${razorpay_payment_id}</p>
-                        </div>
-                        <p style="font-size: 14px; color: #64748b; text-align: center;">Thank you for choosing MediCare!</p>
-                      </div>`,
-        });
-      }
-
-      // Dispatch Doctor Email
-      if (doctorUser) {
-        await sendEmail({
-          email: doctorUser.email,
-          subject: "Action Required: New Paid Patient Booking - MediCare",
-          message: `
-                      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
-                        <h1 style="color: #16a34a; text-align: center;">New Patient Scheduled! 🩺</h1>
-                        <p style="font-size: 16px; color: #333;">Dr. <strong>${doctor.doctorDetails?.fullname || doctor.doctor}</strong>,</p>
-                        <p style="font-size: 16px; color: #333;">Great news! A new patient has successfully booked and <b>PAID</b> for one of your available time slots.</p>
-                        <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                          <p style="margin: 5px 0; color: #166534;"><strong>Patient Name:</strong> ${patientUser?.fullname || "Patient"}</p>
-                          <p style="margin: 5px 0; color: #166534;"><strong>Date:</strong> ${appointment.date.toDateString()}</p>
-                          <p style="margin: 5px 0; color: #166534;"><strong>Time Slot:</strong> ${appointment.timeSlots}</p>
-                          <p style="margin: 5px 0; color: #166534;"><strong>Reason for Visit:</strong> ${appointment.reason}</p>
-                        </div>
-                      </div>`,
-        });
-      }
-    } catch (emailError) {
-      console.error("Email Dispatch Error After Payment:", emailError);
+  try {
+    const response = await Cashfree.PGFetchOrder("2023-08-01", order_id);
+    
+    if (response.data.order_status !== "PAID") {
+      appointment.paymentStatus = "FAILED";
+      await appointment.save();
+      throw new ApiError(400, "Payment verification failed. Order is not paid.");
     }
-  }
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, appointment, "Payment verified successfully"));
+    // Payment is successful
+    appointment.paymentStatus = "PAID";
+    appointment.paymentMethod = "CASHFREE";
+    appointment.status = "CONFIRMED"; // officially confirm it
+    appointment.paidAt = new Date();
+    appointment.cashfreeOrderId = order_id;
+
+    await appointment.save();
+
+    // Dispatch emails and stats
+    const doctor = await Doctor.findById(appointment.doctorId);
+    if (doctor) {
+      doctor
+        .updateDoctorStats()
+        .catch((err) => console.error("Stats Update Error:", err));
+
+      try {
+        const patientUser = await User.findById(appointment.patientId);
+        const doctorUser = await User.findById(doctor.doctorId);
+
+        // Dispatch Patient Email
+        if (patientUser) {
+          await sendEmail({
+            email: patientUser.email,
+            subject: "Payment Received & Appointment Confirmed - MediCare",
+            message: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
+                          <h1 style="color: #2563eb; text-align: center;">Appointment Confirmed! 🎉</h1>
+                          <p style="font-size: 16px; color: #333;">Hi <strong>${patientUser.fullname}</strong>,</p>
+                          <p style="font-size: 16px; color: #333;">Your payment was successful and your appointment has been confirmed! Here are your official booking details:</p>
+                          <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="margin: 5px 0;"><strong>Doctor:</strong> Dr. ${doctor.doctorDetails?.fullname || doctor.doctor}</p>
+                            <p style="margin: 5px 0;"><strong>Date:</strong> ${appointment.date.toDateString()}</p>
+                            <p style="margin: 5px 0;"><strong>Time:</strong> ${appointment.timeSlots}</p>
+                            <p style="margin: 5px 0;"><strong>Consultation Fee:</strong> ₹${appointment.consultationFee} (PAID)</p>
+                            <p style="margin: 5px 0;"><strong>Order ID:</strong> ${order_id}</p>
+                          </div>
+                          <p style="font-size: 14px; color: #64748b; text-align: center;">Thank you for choosing MediCare!</p>
+                        </div>`,
+          });
+        }
+
+        // Dispatch Doctor Email
+        if (doctorUser) {
+          await sendEmail({
+            email: doctorUser.email,
+            subject: "Action Required: New Paid Patient Booking - MediCare",
+            message: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
+                          <h1 style="color: #16a34a; text-align: center;">New Patient Scheduled! 🩺</h1>
+                          <p style="font-size: 16px; color: #333;">Dr. <strong>${doctor.doctorDetails?.fullname || doctor.doctor}</strong>,</p>
+                          <p style="font-size: 16px; color: #333;">Great news! A new patient has successfully booked and <b>PAID</b> for one of your available time slots.</p>
+                          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="margin: 5px 0; color: #166534;"><strong>Patient Name:</strong> ${patientUser?.fullname || "Patient"}</p>
+                            <p style="margin: 5px 0; color: #166534;"><strong>Date:</strong> ${appointment.date.toDateString()}</p>
+                            <p style="margin: 5px 0; color: #166534;"><strong>Time Slot:</strong> ${appointment.timeSlots}</p>
+                            <p style="margin: 5px 0; color: #166534;"><strong>Reason for Visit:</strong> ${appointment.reason}</p>
+                          </div>
+                        </div>`,
+          });
+        }
+      } catch (emailError) {
+        console.error("Email Dispatch Error After Payment:", emailError);
+      }
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, appointment, "Payment verified successfully"));
+
+  } catch (error) {
+    console.error("Cashfree Fetch Order Error:", error.response?.data || error);
+    throw new ApiError(500, "Failed to verify payment with Cashfree");
+  }
 });
