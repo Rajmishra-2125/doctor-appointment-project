@@ -66,7 +66,7 @@ function PaymentPage() {
     try {
       // 1. Load Cashfree SDK
       const cashfree = await load({
-        mode: "sandbox", // Switch to "production" when live
+        mode: "production", // Switch to "production" when live
       });
 
       // 2. Create order on Backend
