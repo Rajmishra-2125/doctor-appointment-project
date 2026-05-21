@@ -95,7 +95,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Missing required payment breakdown details");
   }
 
-  const appointment = await Appointment.findById(appointmentId);
+  const appointment = await Appointment.findById(appointmentId).populate("doctorId");
   if (!appointment) {
     throw new ApiError(404, "Appointment not found");
   }
