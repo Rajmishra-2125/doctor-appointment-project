@@ -1,11 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect } from "react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") ? localStorage.getItem("theme") : "system",
-  );
+  const [theme, setTheme] = useLocalStorage("theme", "system");
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -45,7 +44,6 @@ export const ThemeProvider = ({ children }) => {
   // Save selection explicitly
   const changeTheme = (newTheme) => {
     setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
   };
 
   return (

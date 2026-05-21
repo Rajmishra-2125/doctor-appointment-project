@@ -1,25 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header/Header.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
 
 function AdminLayout({ children }) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
-    try {
-      const saved = localStorage.getItem("adminSidebarCollapsed");
-      return saved ? JSON.parse(saved) : false;
-    } catch (error) {
-      return false;
-    }
-  });
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage("adminSidebarCollapsed", false);
 
   const toggleSidebar = () => {
-    setIsSidebarCollapsed((prev) => {
-      const newState = !prev;
-      localStorage.setItem("adminSidebarCollapsed", JSON.stringify(newState));
-      return newState;
-    });
+    setIsSidebarCollapsed((prev) => !prev);
   };
 
   return (

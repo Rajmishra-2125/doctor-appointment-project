@@ -1,25 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header/Header.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
 
 function DoctorLayout({ children }) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
-    try {
-      const saved = localStorage.getItem("doctorSidebarCollapsed");
-      return saved ? JSON.parse(saved) : false;
-    } catch (error) {
-      return false;
-    }
-  });
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage("doctorSidebarCollapsed", false);
 
   const toggleSidebar = () => {
-    setIsSidebarCollapsed((prev) => {
-      const newState = !prev;
-      localStorage.setItem("doctorSidebarCollapsed", JSON.stringify(newState));
-      return newState;
-    });
+    setIsSidebarCollapsed((prev) => !prev);
   };
 
   return (
