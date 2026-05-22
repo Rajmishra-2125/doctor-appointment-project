@@ -35,7 +35,7 @@ router.route("/google").post(googleAuthLogin);
 router.route("/verify-otp").post(upload.none(), verifyEmailOTP);
 
 // Refresh access token
-router.route("/refresh-token").get(refreshAccessToken);
+router.route("/refresh-token").get(refreshAccessToken).post(refreshAccessToken);
 
 // <=> Secured routes <=>
 
