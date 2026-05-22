@@ -78,15 +78,33 @@ function Home() {
     },
   ];
 
-  // Specialties
-  const specialties = [
-    { icon: Heart, name: "Cardiology", doctors: 12 },
-    { icon: Brain, name: "Neurology", doctors: 8 },
-    { icon: Sparkles, name: "Dermatology", doctors: 6 },
-    { icon: Activity, name: "Orthopedics", doctors: 10 },
-    { icon: Baby, name: "Pediatrics", doctors: 15 },
-    { icon: Eye, name: "Ophthalmology", doctors: 7 },
-  ];
+  // Dynamic Specialties calculations based on database doctors
+  const specialties = useMemo(() => {
+    const defaultSpecialties = [
+      { icon: Heart, name: "Cardiology" },
+      { icon: Brain, name: "Neurology" },
+      { icon: Sparkles, name: "Dermatology" },
+      { icon: Activity, name: "Orthopedics" },
+      { icon: Baby, name: "Pediatrics" },
+      { icon: Eye, name: "Ophthalmology" },
+    ];
+
+    if (!doctors || !Array.isArray(doctors)) {
+      return defaultSpecialties.map((s) => ({ ...s, doctors: 0 }));
+    }
+
+    return defaultSpecialties.map((spec) => {
+      const count = doctors.filter((doc) => {
+        const specName = (doc.specialization || "").toLowerCase().trim();
+        return specName === spec.name.toLowerCase().trim();
+      }).length;
+
+      return {
+        ...spec,
+        doctors: count,
+      };
+    });
+  }, [doctors]);
 
   // Top Doctors
   const topDoctors = useMemo(() => {
