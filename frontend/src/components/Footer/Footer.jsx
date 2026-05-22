@@ -64,44 +64,44 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
-                  href="/doctors"
+                <Link
+                  to="/doctors"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Find Doctors
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/specialties"
+                <Link
+                  to="/doctors"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Specialties
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/appointments"
+                <Link
+                  to="/appointments"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Book Appointment
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/about"
+                <Link
+                  to="/about"
                   className="hover:text-orange-500 transition-colors"
                 >
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/contact"
+                <Link
+                  to="/contact"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -111,44 +111,44 @@ const Footer = () => {
             <h3 className="text-white text-lg font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
-                  href="/services/consultation"
+                <Link
+                  to="/services"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Online Consultation
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/services/lab-tests"
+                <Link
+                  to="/services"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Lab Tests
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/services/prescriptions"
+                <Link
+                  to="/services"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Prescription Refills
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/services/health-records"
+                <Link
+                  to="/services"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Health Records
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/services/emergency"
+                <Link
+                  to="/services"
                   className="hover:text-orange-500 transition-colors"
                 >
                   Emergency Care
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -215,12 +215,12 @@ const Footer = () => {
               >
                 Terms of Service
               </Link>
-              <a
-                href="/cookies"
+              <Link
+                to="/privacy-policy"
                 className="hover:text-orange-500 transition-colors"
               >
                 Cookie Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>
