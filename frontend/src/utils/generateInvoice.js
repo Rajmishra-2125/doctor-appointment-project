@@ -12,7 +12,7 @@ export const generateInvoice = (transaction) => {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(24);
   doc.setTextColor(79, 70, 229); // indigo-600
-  doc.text("Healthcare Platform", 14, 25);
+  doc.text("Medicare", 14, 25);
   
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139); // slate-500
